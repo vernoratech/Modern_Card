@@ -3,7 +3,7 @@ export const menuData = {
   restaurant: {
     name: "Spice Garden",
     tagline: "Authentic Flavors, Digital Experience",
-    logo: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&h=100&fit=crop&crop=center",
+    logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSdDg5Ytz_FUJSW2rpmddN765JFvh6R0U5BVQ&s",
     phone: "+91 98765 43210",
     address: "123 Food Street, Mumbai"
   },
