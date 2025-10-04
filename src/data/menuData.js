@@ -27,6 +27,11 @@ export const menuData = {
       category: "Starters",
       categoryId: 1,
       image: "https://images.unsplash.com/photo-1567188040759-fb8a883dc6d8?w=500&h=400&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1564758866813-579dacd410f6?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1604908177522-4023ac76c597?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1543353071-10c8ba85a904?w=900&h=700&fit=crop"
+      ],
       isVeg: true,
       isVegan: false,
       isGlutenFree: true,
@@ -50,6 +55,11 @@ export const menuData = {
       category: "Starters",
       categoryId: 1,
       image: "https://images.unsplash.com/photo-1599487488170-d11ec9c172f0?w=500&h=400&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1589308078056-fb81df62d0f8?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1604908177330-56e67c8ca4a0?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&h=700&fit=crop"
+      ],
       isVeg: false,
       spiceLevel: 3,
       prepTime: "20-25 mins",
@@ -70,6 +80,11 @@ export const menuData = {
       category: "Starters",
       categoryId: 1,
       image: "https://images.unsplash.com/photo-1551754655-cd27e38d2076?w=500&h=400&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1604908178039-1196d6ed86c8?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1550426735-5c2d0f1e1d4d?w=900&h=700&fit=crop"
+      ],
       isVeg: true,
       isVegan: true,
       spiceLevel: 1,
@@ -93,6 +108,11 @@ export const menuData = {
       category: "Main Course",
       categoryId: 2,
       image: "https://images.unsplash.com/photo-1588166524941-3bf61a9c41db?w=500&h=400&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1612872087720-bb876e8edc51?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1559050019-6d7d84afd394?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1543352634-873f17a7a088?w=900&h=700&fit=crop"
+      ],
       isVeg: false,
       spiceLevel: 2,
       prepTime: "25-30 mins",
@@ -115,6 +135,11 @@ export const menuData = {
       category: "Main Course",
       categoryId: 2,
       image: "https://images.unsplash.com/photo-1546833999-b9f581a1996d?w=500&h=400&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1631452180499-b0934fe414f3?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1625944528957-b81960b4f0e7?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1604908177210-39fb8bcbac2b?w=900&h=700&fit=crop"
+      ],
       isVeg: true,
       spiceLevel: 2,
       prepTime: "20-25 mins",
@@ -135,6 +160,11 @@ export const menuData = {
       category: "Main Course",
       categoryId: 2,
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTDZ3ZQJE5fBRi12IW4NEz_y0VuCfctrITCCQ&s",
+      gallery: [
+        "https://images.unsplash.com/photo-1604908178091-5983e88f3673?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1598514982626-1b1b845a70d2?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1574920162043-8f6333eeff09?w=900&h=700&fit=crop"
+      ],
       isVeg: false,
       spiceLevel: 3,
       prepTime: "35-40 mins",
@@ -158,6 +188,11 @@ export const menuData = {
       category: "Beverages",
       categoryId: 3,
       image: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSu8P05JVnj_B0a2aViUUrZM9Ar2Bn47jc13w&s",
+      gallery: [
+        "https://images.unsplash.com/photo-1504753793650-d4a2b783c15e?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1527169402691-feff5539e52c?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1497534446932-c925b458314e?w=900&h=700&fit=crop"
+      ],
       isVeg: true,
       spiceLevel: 0,
       prepTime: "5 mins",
@@ -178,6 +213,11 @@ export const menuData = {
       category: "Beverages",
       categoryId: 3,
       image: "https://images.unsplash.com/photo-1544145945-f90425340c7e?w=500&h=400&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1527169402691-feff5539e52c?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1604908177990-5228be894ae2?w=900&h=700&fit=crop"
+      ],
       isVeg: true,
       isVegan: true,
       spiceLevel: 0,
@@ -201,6 +241,11 @@ export const menuData = {
       category: "Desserts",
       categoryId: 4,
       image: "https://images.unsplash.com/photo-1631452180519-c014fe946bc7?w=500&h=400&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1599785209707-28a7e53b5e26?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1570197788417-0b21131a978e?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=900&h=700&fit=crop"
+      ],
       isVeg: true,
       spiceLevel: 0,
       prepTime: "5 mins",
@@ -221,6 +266,11 @@ export const menuData = {
       category: "Desserts",
       categoryId: 4,
       image: "https://images.unsplash.com/photo-1488477181946-6428a0291777?w=500&h=400&fit=crop",
+      gallery: [
+        "https://images.unsplash.com/photo-1589308078056-fb81df62d0f8?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1497534446932-c925b458314e?w=900&h=700&fit=crop",
+        "https://images.unsplash.com/photo-1570197788417-0b21131a978e?w=900&h=700&fit=crop"
+      ],
       isVeg: true,
       spiceLevel: 0,
       prepTime: "5 mins",
