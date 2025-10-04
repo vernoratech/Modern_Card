@@ -1,5 +1,6 @@
 // src/pages/DigitalMenu/DigitalMenu.jsx
 import React, { useState, useEffect, useMemo } from 'react';
+import { useLocation } from 'react-router-dom';
 import { menuData } from '../../data/menuData.js';
 import MenuHeader from './MenuHeader.jsx';
 import MenuFilters from './MenuFilters.jsx';
@@ -7,14 +8,59 @@ import MenuGrid from './MenuGrid.jsx';
 import ProductModal from './ProductModal.jsx';
 import MenuNavbar from './MenuNavbar.jsx';
 import './DigitalMenu.css';
+import { fetchRestaurantMenuById } from '../../services/restaurantService.js';
 
 const DigitalMenu = () => {
+  const location = useLocation();
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [filteredItems, setFilteredItems] = useState(menuData.menuItems)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [restaurantResponse, setRestaurantResponse] = useState(null)
+  const [restaurantError, setRestaurantError] = useState(null)
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const rawRestaurantId = params.get('restaurant_id');
+
+    if (!rawRestaurantId) {
+      return;
+    }
+
+    const decodedId = decodeURIComponent(rawRestaurantId);
+    const normalizedRestaurantId = decodedId.split('/')[0];
+
+    if (!normalizedRestaurantId) {
+      console.warn('Unable to derive restaurant id from query params:', rawRestaurantId);
+      return;
+    }
+
+    const fetchRestaurantData = async () => {
+      try {
+        const apiResponse = await fetchRestaurantMenuById(normalizedRestaurantId);
+        setRestaurantResponse(apiResponse);
+        setRestaurantError(null);
+      } catch (error) {
+        setRestaurantError(error);
+      }
+    };
+
+    fetchRestaurantData();
+  }, [location.search]);
+
+  useEffect(() => {
+    if (restaurantResponse) {
+      console.log('Restaurant API response:', restaurantResponse);
+    }
+  }, [restaurantResponse]);
+
+  useEffect(() => {
+    if (restaurantError) {
+      console.error('Error fetching restaurant menu data:', restaurantError);
+    }
+  }, [restaurantError]);
 
   const heroStats = useMemo(() => {
     const totalItems = menuData.menuItems.length;
@@ -69,8 +115,8 @@ const DigitalMenu = () => {
   return (
     <div className="digital-menu">
       <div className="menu-container max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
-        <MenuNavbar restaurant={menuData.restaurant} />
-        <MenuHeader restaurant={menuData.restaurant} stats={heroStats} />
+        <MenuNavbar restaurant={menuData.restaurant} restaurantResponse={restaurantResponse}/>
+        <MenuHeader restaurant={menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse}/>
 
         <MenuFilters
           categories={menuData.categories}

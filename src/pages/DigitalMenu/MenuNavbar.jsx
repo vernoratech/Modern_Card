@@ -2,7 +2,7 @@ import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useState, useEffect } from 'react';
 
-const MenuNavbar = ({ restaurant }) => {
+const MenuNavbar = ({ restaurant, restaurantResponse }) => {
   const navigate = useNavigate();
   const { itemCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
@@ -33,7 +33,7 @@ const MenuNavbar = ({ restaurant }) => {
       });
     }
   };
-
+console.log("restaurantResponse:",restaurantResponse);
   return (
     <nav
       className={`sticky top-0 z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-2 rounded-none border-b border-white/10 bg-slate-900/95 px-3 py-3 text-white shadow-lg backdrop-blur-md transition-all duration-300 sm:px-4 sm:py-3 md:mt-6 md:rounded-2xl md:border md:px-6 ${
@@ -58,12 +58,12 @@ const MenuNavbar = ({ restaurant }) => {
           <span className={`text-[9px] uppercase tracking-widest text-slate-300/70 transition-all duration-300 sm:text-[10px] ${
             isScrolled ? 'hidden sm:block' : 'block'
           }`}>
-            Modern Dining
+            {restaurantResponse?.data?.cuisine}
           </span>
           <h1 className={`font-semibold leading-tight transition-all duration-300 ${
             isScrolled ? 'text-xs sm:text-sm md:text-base' : 'text-sm sm:text-base md:text-lg'
           }`}>
-            {restaurant.name}
+            {restaurantResponse?.data?.restaurantName}
           </h1>
         </div>
       </button>
