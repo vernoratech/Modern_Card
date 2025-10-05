@@ -8,7 +8,7 @@ import MenuGrid from './MenuGrid.jsx';
 import ProductModal from './ProductModal.jsx';
 import MenuNavbar from './MenuNavbar.jsx';
 import './DigitalMenu.css';
-import { fetchRestaurantMenuById } from '../../services/restaurantService.js';
+import { fetchRestaurantMenuById, fetchTableDetails } from '../../services/restaurantService.js';
 
 const DigitalMenu = () => {
   const location = useLocation();
@@ -20,17 +20,23 @@ const DigitalMenu = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [restaurantResponse, setRestaurantResponse] = useState(null)
   const [restaurantError, setRestaurantError] = useState(null)
+  const [tableResponse, setTableResponse] = useState(null)
+  const [tableError, setTableError] = useState(null)
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const rawRestaurantId = params.get('restaurant_id');
+    const rawTableId = params.get('table_id');
 
     if (!rawRestaurantId) {
       return;
     }
 
-    const decodedId = decodeURIComponent(rawRestaurantId);
-    const normalizedRestaurantId = decodedId.split('/')[0];
+    const decodedRestaurantId = decodeURIComponent(rawRestaurantId);
+    const normalizedRestaurantId = decodedRestaurantId.split('/')[0];
+
+    const decodedTableId = rawTableId ? decodeURIComponent(rawTableId) : null;
+    const normalizedTableId = decodedTableId ? decodedTableId.split('/').pop() : null;
 
     if (!normalizedRestaurantId) {
       console.warn('Unable to derive restaurant id from query params:', rawRestaurantId);
@@ -48,6 +54,23 @@ const DigitalMenu = () => {
     };
 
     fetchRestaurantData();
+
+    if (normalizedTableId) {
+      const fetchTableData = async () => {
+        try {
+          const apiResponse = await fetchTableDetails(normalizedRestaurantId, normalizedTableId);
+          setTableResponse(apiResponse);
+          setTableError(null);
+        } catch (error) {
+          setTableError(error);
+        }
+      };
+
+      fetchTableData();
+    } else {
+      setTableResponse(null);
+      setTableError(null);
+    }
   }, [location.search]);
 
   useEffect(() => {
@@ -61,6 +84,18 @@ const DigitalMenu = () => {
       console.error('Error fetching restaurant menu data:', restaurantError);
     }
   }, [restaurantError]);
+
+  useEffect(() => {
+    if (tableResponse) {
+      console.log('Table API response:', tableResponse);
+    }
+  }, [tableResponse]);
+
+  useEffect(() => {
+    if (tableError) {
+      console.error('Error fetching table data:', tableError);
+    }
+  }, [tableError]);
 
   const heroStats = useMemo(() => {
     const totalItems = menuData.menuItems.length;
@@ -116,6 +151,46 @@ const DigitalMenu = () => {
     <div className="digital-menu">
       <div className="menu-container max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
         <MenuNavbar restaurant={menuData.restaurant} restaurantResponse={restaurantResponse}/>
+
+        {tableResponse?.data && (
+          <section className="mt-4 mb-6 rounded-2xl border border-sky-500/20 bg-sky-500/10 p-4 sm:p-6 text-slate-900 shadow-sm backdrop-blur-xl">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+              <div className="space-y-1">
+                <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-sky-700 shadow-sm">
+                  <span>Table #{tableResponse.data.tableNumber}</span>
+                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500">
+                    {tableResponse.data.location}
+                  </span>
+                </div>
+                <h2 className="text-lg font-semibold text-slate-900 sm:text-xl md:text-2xl">
+                  Reserved table details
+                </h2>
+                <p className="text-sm text-slate-600">
+                  Seating capacity for {tableResponse.data.capacity} guests · Status: <span className="font-semibold capitalize">{tableResponse.data.status}</span>
+                </p>
+              </div>
+              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+                <div className="rounded-xl bg-white/80 px-4 py-3 text-center shadow">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Capacity</p>
+                  <p className="text-lg font-semibold text-slate-900">{tableResponse.data.capacity}</p>
+                </div>
+                <div className="rounded-xl bg-white/80 px-4 py-3 text-center shadow">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Status</p>
+                  <p className={`text-lg font-semibold capitalize ${tableResponse.data.status === 'available' ? 'text-emerald-600' : 'text-amber-600'}`}>
+                    {tableResponse.data.status}
+                  </p>
+                </div>
+                <div className="rounded-xl bg-white/80 px-4 py-3 text-center shadow">
+                  <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Reserved</p>
+                  <p className={`text-lg font-semibold ${tableResponse.data.reservedStatus ? 'text-rose-600' : 'text-emerald-600'}`}>
+                    {tableResponse.data.reservedStatus ? 'Yes' : 'No'}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </section>
+        )}
+
         <MenuHeader restaurant={menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse}/>
 
         <MenuFilters

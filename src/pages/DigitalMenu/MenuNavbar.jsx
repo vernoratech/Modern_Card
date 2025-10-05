@@ -7,6 +7,12 @@ const MenuNavbar = ({ restaurant, restaurantResponse }) => {
   const { itemCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
 
+  const isPreviewMode = !restaurantResponse?.data;
+  const responseData = restaurantResponse?.data ?? {};
+  const displayCuisine = responseData.cuisine ?? restaurant?.cuisine ?? 'Chinese';
+  const displayName = responseData.restaurantName ?? restaurant?.name ?? 'Brijesh fast food';
+  const displayLogo = responseData.logoUrl ?? restaurant?.logo;
+
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 100);
@@ -47,8 +53,8 @@ console.log("restaurantResponse:",restaurantResponse);
         className="flex items-center gap-2 transition-opacity hover:opacity-80 sm:gap-3"
       >
         <img
-          src={restaurant.logo}
-          alt={restaurant.name}
+          src={displayLogo}
+          alt={displayName}
           loading="lazy"
           className={`rounded-lg border border-white/15 object-cover shadow-md transition-all duration-300 sm:rounded-xl ${
             isScrolled ? 'h-8 w-8 sm:h-10 sm:w-10' : 'h-10 w-10 sm:h-12 sm:w-12 md:h-14 md:w-14'
@@ -58,12 +64,19 @@ console.log("restaurantResponse:",restaurantResponse);
           <span className={`text-[9px] uppercase tracking-widest text-slate-300/70 transition-all duration-300 sm:text-[10px] ${
             isScrolled ? 'hidden sm:block' : 'block'
           }`}>
-            {restaurantResponse?.data?.cuisine}
+            <span className="flex items-center gap-1">
+              {displayCuisine}
+              {isPreviewMode && (
+                <span className="hidden rounded-full border border-sky-400/40 bg-sky-500/15 px-2 py-0.2 text-[8px] font-semibold uppercase tracking-widest text-sky-200 sm:inline-flex">
+                  Preview
+                </span>
+              )}
+            </span>
           </span>
           <h1 className={`font-semibold leading-tight transition-all duration-300 ${
             isScrolled ? 'text-xs sm:text-sm md:text-base' : 'text-sm sm:text-base md:text-lg'
           }`}>
-            {restaurantResponse?.data?.restaurantName}
+            {displayName}
           </h1>
         </div>
       </button>
