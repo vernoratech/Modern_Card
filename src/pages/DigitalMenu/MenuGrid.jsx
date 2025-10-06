@@ -2,7 +2,7 @@
 import React, { useMemo } from 'react';
 import ProductCard from './ProductCard';
 
-const MenuGrid = ({ items, viewMode, onProductClick }) => {
+const MenuGrid = ({ items, onProductClick }) => {
   const emptyState = useMemo(() => (
     <div 
       className="flex flex-col items-center justify-center py-16 px-4 text-center"
@@ -32,24 +32,33 @@ const MenuGrid = ({ items, viewMode, onProductClick }) => {
   }
 
   return (
-    <div 
+    <div
       id="menu-grid"
-      className={`${viewMode === 'grid'
-        ? 'grid grid-cols-1 xs:grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 2xl:grid-cols-4 gap-3 sm:gap-4 md:gap-5 lg:gap-6 p-3 sm:p-4 md:p-5 lg:p-6'
-        : 'space-y-4 sm:space-y-5 md:space-y-6 max-w-5xl mx-auto p-3 sm:p-4 md:p-5 lg:p-6'}`}
+      className="relative"
     >
-      {items.map((item) => (
-        <div
-          key={item.id}
-          className={viewMode === 'grid' ? 'h-full' : ''}
-        >
-          <ProductCard
-            product={item}
-            viewMode={viewMode}
-            onProductClick={onProductClick}
-          />
-        </div>
-      ))}
+      <div
+        className="flex snap-x overflow-x-auto gap-4 sm:gap-5 lg:gap-6 p-4 sm:p-5 md:p-6 scroll-smooth"
+        style={{ WebkitOverflowScrolling: 'touch' }}
+      >
+        {items.map((item) => (
+          <div
+            key={item.id}
+            className="snap-start flex-shrink-0 w-[14.5rem] sm:w-[17rem] md:w-[18.5rem] lg:w-[20rem] transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl"
+          >
+            <ProductCard
+              product={item}
+              viewMode="grid"
+              onProductClick={onProductClick}
+            />
+          </div>
+        ))}
+      </div>
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
+      <style>{`
+        #menu-grid > div::-webkit-scrollbar { display: none; }
+        #menu-grid > div { scrollbar-width: none; }
+      `}</style>
     </div>
   );
 };

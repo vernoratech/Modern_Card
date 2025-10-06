@@ -7,8 +7,6 @@ const MenuFilters = ({
   onCategoryChange,
   searchQuery,
   onSearchChange,
-  viewMode,
-  onViewModeChange,
   totalItems
 }) => {
   const safeCategories = Array.isArray(categories) ? categories.filter(Boolean) : [];
@@ -39,28 +37,10 @@ const MenuFilters = ({
           )}
         </div>
 
-        <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:gap-3 text-xs sm:text-sm font-semibold text-slate-600 md:w-auto">
+        <div className="flex w-full items-center justify-end gap-2 sm:gap-3 text-xs sm:text-sm font-semibold text-slate-600 md:w-auto">
           <span className="rounded-full border border-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 text-slate-700">
             {totalItems} items found
           </span>
-          <div className="flex items-center gap-1.5 sm:gap-2 rounded-full bg-slate-100 p-1.5 sm:p-2">
-            <button
-              className={`rounded-full px-2.5 sm:px-3 py-1 text-sm sm:text-base transition ${
-                viewMode === 'grid' ? 'bg-white text-sky-600 shadow-md' : 'text-slate-500'
-              }`}
-              onClick={() => onViewModeChange('grid')}
-            >
-              ⚏
-            </button>
-            <button
-              className={`rounded-full px-2.5 sm:px-3 py-1 text-sm sm:text-base transition ${
-                viewMode === 'list' ? 'bg-white text-sky-600 shadow-md' : 'text-slate-500'
-              }`}
-              onClick={() => onViewModeChange('list')}
-            >
-              ☰
-            </button>
-          </div>
         </div>
       </div>
 

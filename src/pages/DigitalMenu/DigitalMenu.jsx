@@ -7,9 +7,12 @@ import MenuFilters from './MenuFilters.jsx';
 import MenuGrid from './MenuGrid.jsx';
 import ProductModal from './ProductModal.jsx';
 import MenuNavbar from './MenuNavbar.jsx';
+import MenuHorizontalShowcase from './MenuHorizontalShowcase.jsx';
 import './DigitalMenu.css';
 import { MdOutlineTableBar } from "react-icons/md";
 import { useRestaurantData } from '../../context/RestaurantDataContext.jsx';
+import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const DigitalMenu = () => {
   const location = useLocation();
@@ -23,9 +26,10 @@ const DigitalMenu = () => {
     tableResponse,
     tableError,
   } = useRestaurantData();
+  const { addToCart } = useCart();
+  const { addToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
-  const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [filteredItems, setFilteredItems] = useState(menuData.menuItems)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -95,7 +99,6 @@ const DigitalMenu = () => {
 
   useEffect(() => {
     if (tableError) {
-      console.error('Error fetching table data:', tableError);
     }
   }, [tableError]);
 
@@ -112,6 +115,16 @@ const DigitalMenu = () => {
       categories,
       averageRating,
     };
+  }, []);
+
+  const showcaseItems = useMemo(() => {
+    const shuffled = [...menuData.menuItems]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 8);
+    return shuffled.map((item) => ({
+      ...item,
+      tag: item.isBestseller ? 'Best Seller' : item.isVeg ? 'Veg' : 'Popular',
+    }));
   }, []);
 
   // Filter menu items based on category and search
@@ -144,6 +157,36 @@ const DigitalMenu = () => {
     setIsModalOpen(true)
   }
 
+  const handleCategoryChange = (categoryName) => {
+    if (!categoryName) return;
+    const normalized = categoryName.toLowerCase();
+    setSelectedCategory(normalized);
+    window.requestAnimationFrame(() => {
+      document.getElementById('menu-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  };
+
+  const handleShowcaseAdd = (item) => {
+    if (!item) return;
+    addToCart({
+      id: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      category: item.category,
+      isVeg: item.isVeg,
+      isVegan: item.isVegan,
+      isGlutenFree: item.isGlutenFree,
+      quantity: 1,
+    });
+    addToast({
+      type: 'success',
+      title: 'Added to cart',
+      message: `${item.name} is ready in your cart.`,
+      position: 'bottom-right',
+    });
+  };
+
   const closeModal = () => {
     setIsModalOpen(false)
     setSelectedProduct(null)
@@ -170,7 +213,7 @@ const DigitalMenu = () => {
               <button
                 type="button"
                 onClick={() => setShowTableBanner(false)}
-                className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/15 text-xs font-semibold text-white transition hover:bg-white/30"
+                className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/15 text-xs font-semibold text-white transition hover:bg-white/30 cursor-pointer"
                 aria-label="Dismiss table details"
               >
                 ✕
@@ -204,7 +247,7 @@ const DigitalMenu = () => {
                 <button
                   type="button"
                   onClick={() => document.getElementById('menu-grid')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow-sm transition hover:from-sky-400 hover:to-indigo-400"
+                  className="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow-sm transition hover:from-sky-400 hover:to-indigo-400 cursor-pointer"
                 >
                   Book this table
                 </button>
@@ -217,7 +260,7 @@ const DigitalMenu = () => {
           <button
             type="button"
             onClick={() => setShowTableBanner(true)}
-            className="fixed bottom-4 right-4 z-30 inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-900/20 bg-sky-500 text-white shadow-xl transition hover:bg-sky-400 sm:bottom-6 sm:right-6"
+            className="fixed bottom-4 right-4 z-30 inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-900/20 bg-sky-500 text-white shadow-xl transition hover:bg-sky-400 sm:bottom-6 sm:right-6 cursor-pointer"
             aria-label="Show table details"
           >
             <MdOutlineTableBar />
@@ -228,17 +271,18 @@ const DigitalMenu = () => {
 
         <MenuFilters
           categories={menuData.categories}
+          selectedCategory={selectedCategory}
+          onCategoryChange={handleCategoryChange}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
-          viewMode={viewMode}
-          onViewModeChange={setViewMode}
           totalItems={filteredItems.length}
         />
+
+
 
         <div key={selectedCategory}>
           <MenuGrid
             items={filteredItems}
-            viewMode={viewMode}
             onProductClick={handleProductClick}
           />
         </div>
@@ -250,6 +294,14 @@ const DigitalMenu = () => {
             restaurant={menuData.restaurant}
           />
         )}
+
+        <MenuHorizontalShowcase
+          title="Explore quick picks"
+          subtitle="A few popular bites you might enjoy"
+          items={showcaseItems}
+          onItemClick={handleProductClick}
+          onAdd={handleShowcaseAdd}
+        />
       </div>
     </div>
   )
