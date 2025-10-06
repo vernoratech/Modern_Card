@@ -19,16 +19,15 @@ const ProductDetails = () => {
           setProduct(foundProduct);
           setActiveImageIdx(0);
         } else {
-          navigate('/menu', { replace: true });
+          navigate('/', { replace: true });
         }
       } catch (error) {
         console.error('Error fetching product:', error);
-        navigate('/menu', { replace: true });
+        navigate('/', { replace: true });
       } finally {
         setIsLoading(false);
       }
     };
-
     fetchProduct();
   }, [productId, navigate]);
 

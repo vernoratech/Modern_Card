@@ -101,7 +101,7 @@ const Checkout = () => {
             <p className="empty-cart-message">
               Add some items to your cart before checking out.
             </p>
-            <Link to="/menu" className="continue-shopping-btn">
+            <Link to="/" className="continue-shopping-btn">
               Continue Shopping
             </Link>
           </div>

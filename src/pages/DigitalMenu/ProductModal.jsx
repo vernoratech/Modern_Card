@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const ProductModal = ({ product, onClose, restaurant }) => {
   const [quantity, setQuantity] = useState(1)
   const { addToCart } = useCart();
+  const { addToast } = useToast();
 
   const getDietaryBadges = () => {
     const badges = []
@@ -21,6 +23,15 @@ const ProductModal = ({ product, onClose, restaurant }) => {
     return product.price * quantity
   }
 
+  const handleQuantityChange = (delta) => {
+    setQuantity((prev) => {
+      const next = prev + delta;
+      if (next < 1) return 1;
+      if (next > 10) return 10;
+      return next;
+    });
+  };
+
   const handleAddToCart = () => {
     addToCart({
       id: product.id,
@@ -32,6 +43,12 @@ const ProductModal = ({ product, onClose, restaurant }) => {
       isVegan: product.isVegan,
       isGlutenFree: product.isGlutenFree,
       quantity: quantity,
+    });
+    addToast({
+      type: 'success',
+      title: 'Added to cart',
+      message: `${quantity} × ${product.name} added to your cart`,
+      position: 'bottom-right',
     });
     onClose();
   };

@@ -21,6 +21,12 @@ const Cart = () => {
     return (
       <div className="cart-page">
         <div className="cart-container">
+          <div className="cart-nav">
+            <Link to="/" className="cart-back-btn">
+              <span aria-hidden="true">←</span>
+              <span>Back to Menu</span>
+            </Link>
+          </div>
           <div className="cart-header">
             <h1 className="cart-title">Shopping Cart</h1>
             <p className="cart-subtitle">Your cart is empty</p>
@@ -34,7 +40,7 @@ const Cart = () => {
             <p className="empty-cart-message">
               Start adding some delicious items to your cart!
             </p>
-            <Link to="/menu" className="continue-shopping-btn">
+            <Link to="/" className="continue-shopping-btn">
               Continue Shopping
             </Link>
           </div>
@@ -47,7 +53,7 @@ const Cart = () => {
     <div className="cart-page">
       <div className="cart-container">
         <div className="cart-nav">
-          <Link to="/menu" className="cart-back-btn">
+          <Link to="/" className="cart-back-btn">
             <span aria-hidden="true">←</span>
             <span>Back to Menu</span>
           </Link>
@@ -169,7 +175,7 @@ const Cart = () => {
             </div>
 
             <div className="cart-actions">
-              <Link to="/menu" className="continue-shopping-btn">
+              <Link to="/" className="continue-shopping-btn">
                 Continue Shopping
               </Link>
               <Link to="/checkout" className="checkout-btn">

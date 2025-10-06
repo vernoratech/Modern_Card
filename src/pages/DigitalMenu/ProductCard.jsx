@@ -2,10 +2,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
+import { useToast } from '../../context/ToastContext.jsx';
 
 const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
+  const { addToast } = useToast();
   const [isHovered, setIsHovered] = useState(false);
 
   const getDietaryBadges = () => {
@@ -52,6 +54,12 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
       isVegan: product.isVegan,
       isGlutenFree: product.isGlutenFree,
       quantity: 1,
+    });
+    addToast({
+      type: 'success',
+      title: 'Added to cart',
+      message: `${product.name} has been added to your cart`,
+      position: 'bottom-right',
     });
   };
 

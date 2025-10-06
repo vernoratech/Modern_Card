@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import { useState, useEffect } from 'react';
+import { FaBowlFood } from 'react-icons/fa6';
 
 const MenuNavbar = ({ restaurant, restaurantResponse }) => {
   const navigate = useNavigate();
   const { itemCount } = useCart();
   const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileNavOpen, setIsMobileNavOpen] = useState(false);
 
   const isPreviewMode = !restaurantResponse?.data;
   const responseData = restaurantResponse?.data ?? {};
@@ -26,30 +28,66 @@ const MenuNavbar = ({ restaurant, restaurantResponse }) => {
     };
   }, []);
 
+  const closeMobileMenu = () => setIsMobileNavOpen(false);
+
   const scrollTo = (id) => {
     const element = document.getElementById(id);
     if (element) {
       const offset = isScrolled ? 80 : 100; // Account for sticky navbar
       const elementPosition = element.getBoundingClientRect().top + window.pageYOffset;
       const offsetPosition = elementPosition - offset;
-
       window.scrollTo({
         top: offsetPosition,
         behavior: 'smooth'
       });
     }
+    closeMobileMenu();
+  }
+
+  const handleNavigate = (path) => {
+    navigate(path);
+    closeMobileMenu();
   };
-console.log("restaurantResponse:",restaurantResponse);
+
+  const handleMobileMenuToggle = () => setIsMobileNavOpen((prev) => !prev);
+
+  const navLinks = [
+    { key: 'overview', label: 'Overview', helper: 'Hero', mode: 'scroll', target: 'menu-hero' },
+    { key: 'menu', label: 'Menu', helper: 'Filters', mode: 'scroll', target: 'menu-filters' },
+    { key: 'dishes', label: 'Dishes', helper: 'List', mode: 'scroll', target: 'menu-grid' },
+    { key: 'contact', label: 'Contact', helper: 'Reach us', mode: 'scroll', target: 'contact-section' },
+    { key: 'about', label: 'About', helper: 'Profile', mode: 'route', path: '/about' }
+  ];
+
+  const handleNavLinkClick = (link) => {
+    if (link.mode === 'scroll') {
+      scrollTo(link.target);
+      return;
+    }
+    if (link.mode === 'route' && link.path) {
+      handleNavigate(link.path);
+    }
+  };
+
   return (
-    <nav
-      className={`sticky top-0 z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-2 rounded-none border-b border-white/10 bg-slate-900/95 px-3 py-3 text-white shadow-lg backdrop-blur-md transition-all duration-300 sm:px-4 sm:py-3 md:mt-6 md:rounded-2xl md:border md:px-6 ${
-        isScrolled ? 'md:py-2.5 lg:py-3' : 'md:py-4'
-      }`}
-    >
+    <>
+      {isMobileNavOpen && (
+        <button
+          type="button"
+          aria-label="Close navigation menu"
+          onClick={closeMobileMenu}
+          className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition md:hidden"
+        />
+      )}
+      <nav
+        className={`sticky top-0 z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-2 rounded-none border-b border-white/10 bg-gradient-to-r from-slate-950/95 via-slate-900/90 to-slate-950/95 px-3 py-3 text-white shadow-xl backdrop-blur-xl transition-all duration-300 sm:px-4 sm:py-3 md:mt-6 md:rounded-2xl md:border md:border-white/5 md:px-6 ${
+          isScrolled ? 'md:py-2.5 lg:py-3' : 'md:py-4'
+        }`}
+      >
       {/* Logo and Brand */}
       <button
         type="button"
-        onClick={() => navigate('/menu')}
+        onClick={() => handleNavigate('/')}
         className="flex items-center gap-2 transition-opacity hover:opacity-80 sm:gap-3"
       >
         <img
@@ -82,81 +120,112 @@ console.log("restaurantResponse:",restaurantResponse);
       </button>
 
       {/* Desktop Navigation Links */}
-      <div className={`hidden items-center gap-1 text-xs font-medium text-slate-100 transition-all duration-300 sm:text-sm md:flex ${
-        isScrolled ? 'lg:flex' : 'md:flex'
-      }`}>
-        <button
-          type="button"
-          onClick={() => scrollTo('menu-hero')}
-          className="rounded-full px-2 py-1 transition hover:bg-white/10 sm:px-3 sm:py-1.5"
-        >
-          Overview
-        </button>
-        <button
-          type="button"
-          onClick={() => scrollTo('menu-filters')}
-          className="rounded-full px-2 py-1 transition hover:bg-white/10 sm:px-3 sm:py-1.5"
-        >
-          Menu
-        </button>
-        <button
-          type="button"
-          onClick={() => scrollTo('menu-grid')}
-          className="rounded-full px-2 py-1 transition hover:bg-white/10 sm:px-3 sm:py-1.5"
-        >
-          Dishes
-        </button>
-        <button
-          type="button"
-          onClick={() => scrollTo('contact-section')}
-          className="rounded-full px-2 py-1 transition hover:bg-white/10 sm:px-3 sm:py-1.5"
-        >
-          Contact
-        </button>
-        <button
-          type="button"
-          onClick={() => navigate('/about')}
-          className="rounded-full px-2 py-1 transition hover:bg-white/10 sm:px-3 sm:py-1.5"
-        >
-          About
-        </button>
+      <div
+        className={`hidden items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-1 py-1 text-xs font-medium text-slate-100 shadow-inner shadow-white/10 transition-all duration-300 sm:text-sm md:flex ${
+          isScrolled ? 'lg:flex' : 'md:flex'
+        }`}
+      >
+        {navLinks.map((link) => (
+          <button
+            key={link.key}
+            type="button"
+            onClick={() => handleNavLinkClick(link)}
+            className="group rounded-full px-3 py-1.5 transition hover:bg-white/15 sm:px-4"
+          >
+            <span className="block text-[11px] font-semibold uppercase tracking-[0.3em] text-white/60 transition group-hover:text-white/90">
+              {link.label}
+            </span>
+            <span className="mt-0.5 block text-[9px] font-medium uppercase tracking-[0.4em] text-white/30">
+              {link.helper}
+            </span>
+          </button>
+        ))}
       </div>
 
       {/* Action Buttons */}
       <div className="flex items-center gap-1.5 sm:gap-2">
         <button
           type="button"
-          onClick={() => navigate('/cart')}
-          className={`relative rounded-full border border-white/20 px-2 py-1.5 text-xs font-semibold text-white transition hover:border-white/40 hover:bg-white/5 sm:px-3 sm:py-2 sm:text-sm ${
-            isScrolled ? 'hidden sm:flex md:flex' : 'hidden md:flex lg:flex'
+          onClick={() => setIsMobileNavOpen((prev) => !prev)}
+          className={`flex h-9 w-9 items-center justify-center rounded-full border border-white/15 bg-white/10 text-white transition md:hidden ${
+            isMobileNavOpen ? 'bg-white/20' : 'hover:bg-white/20'
           }`}
+          aria-label="Toggle navigation menu"
         >
-          <svg className="w-3 h-3 mr-1 sm:w-4 sm:h-4 sm:mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l-2.5-5M17 19a2 2 0 100 4 2 2 0 000-4zM9 19a2 2 0 100 4 2 2 0 000-4z" />
-          </svg>
-          Cart
-          {itemCount > 0 && (
-            <span className="absolute -top-1 -right-1 bg-red-500 text-white text-[10px] rounded-full w-4 h-4 flex items-center justify-center font-bold sm:w-5 sm:h-5 sm:text-xs">
-              {itemCount > 9 ? '9+' : itemCount}
-            </span>
-          )}
+          <span className="relative flex flex-col items-center justify-center gap-1.5">
+            <span
+              className={`block h-0.5 w-4 rounded bg-current transition-transform duration-200 ${
+                isMobileNavOpen ? 'translate-y-1 rotate-45' : ''
+              }`}
+            />
+            <span
+              className={`block h-0.5 w-4 rounded bg-current transition-opacity duration-200 ${
+                isMobileNavOpen ? 'opacity-0' : 'opacity-100'
+              }`}
+            />
+            <span
+              className={`block h-0.5 w-4 rounded bg-current transition-transform duration-200 ${
+                isMobileNavOpen ? '-translate-y-1 -rotate-45' : ''
+              }`}
+            />
+          </span>
         </button>
+       
         <button
           type="button"
-          onClick={() => navigate('/cart')}
-          className={`rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 font-semibold text-slate-900 transition hover:from-cyan-300 hover:to-indigo-400 ${
-            isScrolled ? 'px-2 py-1 text-[10px] sm:px-3 sm:py-1.5 sm:text-xs md:px-4 md:py-2 md:text-sm' : 'px-3 py-2 text-xs sm:px-4 sm:py-2 sm:text-sm'
+          onClick={() => handleNavigate('/cart')}
+          className={`relative inline-flex items-center justify-center rounded-full bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 transition hover:from-cyan-300 hover:to-indigo-400 ${
+            isScrolled
+              ? 'h-10 w-10 text-[11px] sm:h-11 sm:w-11 sm:text-xs md:h-auto md:w-auto md:px-4 md:py-2 md:text-sm'
+              : 'h-11 w-11 text-xs sm:h-12 sm:w-12 sm:text-sm md:h-auto md:w-auto md:px-4 md:py-2 md:text-sm'
           }`}
         >
-          View Cart
+          <span className="inline-flex md:hidden items-center justify-center">
+            <FaBowlFood size={isScrolled ? 18 : 20} />
+          </span>
+          <span className="hidden md:inline font-semibold text-slate-900">View Cart</span>
           {itemCount > 0 && (
-            <span className="ml-2 inline-flex h-4 min-w-[1.25rem] items-center justify-center rounded-full bg-white/90 px-2 text-[9px] font-bold text-slate-900 shadow sm:h-5 sm:min-w-[1.5rem] sm:text-xs">
+            <span className="absolute -top-1.5 -right-1.5 flex h-5 w-5 items-center justify-center rounded-full bg-white/95 text-[10px] font-bold text-slate-900 shadow sm:h-6 sm:w-6 sm:text-xs md:-top-2 md:-right-2">
               {itemCount > 9 ? '9+' : itemCount}
             </span>
           )}
         </button>
       </div>
-    </nav>
+
+      {/* Mobile Navigation Panel */}
+      {isMobileNavOpen && (
+        <div className="absolute left-3 right-3 top-full z-50 mt-3 flex flex-col gap-2 rounded-2xl border border-white/10 bg-slate-950/95 p-4 text-sm shadow-[0_32px_60px_rgba(8,15,40,0.45)] backdrop-blur-xl md:hidden">
+          {navLinks.map((link) => (
+            <button
+              key={link.key}
+              type="button"
+              onClick={() => handleNavLinkClick(link)}
+              className="flex items-center justify-between rounded-xl border border-white/10 px-3 py-2 text-left font-semibold text-slate-100 transition hover:bg-white/10"
+            >
+              <span>{link.label}</span>
+              <span className="text-[10px] uppercase tracking-[0.35em] text-white/40">{link.helper}</span>
+            </button>
+          ))}
+          <div className="mt-3 grid grid-cols-2 gap-2">
+            <button
+              type="button"
+              onClick={() => handleNavigate('/cart')}
+              className="rounded-xl border border-white/15 px-3 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Cart ({itemCount})
+            </button>
+            <button
+              type="button"
+              onClick={() => handleNavigate('/checkout')}
+              className="rounded-xl bg-gradient-to-r from-cyan-400 via-sky-500 to-indigo-500 px-3 py-2 text-sm font-semibold text-slate-900 transition hover:from-cyan-300 hover:to-indigo-400"
+            >
+              Checkout
+            </button>
+          </div>
+        </div>
+      )}
+      </nav>
+    </>
   );
 };
 

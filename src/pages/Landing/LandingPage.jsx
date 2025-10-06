@@ -14,20 +14,18 @@ const LandingPage = () => {
           <div className="flex justify-between items-center">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-lg">V</span>
               </div>
               <h1 className="text-2xl font-bold text-gray-900">VesnoraTech</h1>
             </div>
             
             <div className="flex items-center space-x-4">
-              <Link 
-                to="/login"
+              <Link
+                to="/"
                 className="text-gray-600 hover:text-gray-900 font-medium"
               >
                 Login
               </Link>
               <Button onClick={() => navigate('/register')}>
-                Get Started
               </Button>
             </div>
           </div>
