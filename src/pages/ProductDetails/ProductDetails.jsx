@@ -12,6 +12,10 @@ const ProductDetails = () => {
   const [activeImageIdx, setActiveImageIdx] = useState(0);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [productId]);
+
+  useEffect(() => {
     const fetchProduct = async () => {
       try {
         const foundProduct = menuData.menuItems.find(item => String(item.id) === productId);
