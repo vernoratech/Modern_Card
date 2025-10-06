@@ -1,6 +1,6 @@
 // src/pages/DigitalMenu/DigitalMenu.jsx
 import React, { useState, useEffect, useMemo } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { menuData } from '../../data/menuData.js';
 import MenuHeader from './MenuHeader.jsx';
 import MenuFilters from './MenuFilters.jsx';
@@ -8,70 +8,72 @@ import MenuGrid from './MenuGrid.jsx';
 import ProductModal from './ProductModal.jsx';
 import MenuNavbar from './MenuNavbar.jsx';
 import './DigitalMenu.css';
-import { fetchRestaurantMenuById, fetchTableDetails } from '../../services/restaurantService.js';
+import { MdOutlineTableBar } from "react-icons/md";
+import { useRestaurantData } from '../../context/RestaurantDataContext.jsx';
 
 const DigitalMenu = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+  const {
+    restaurantId,
+    restaurantResponse,
+    restaurantError,
+    setIdentifiers,
+    tableId,
+    tableResponse,
+    tableError,
+  } = useRestaurantData();
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [viewMode, setViewMode] = useState('grid') // 'grid' or 'list'
   const [selectedProduct, setSelectedProduct] = useState(null)
   const [filteredItems, setFilteredItems] = useState(menuData.menuItems)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const [restaurantResponse, setRestaurantResponse] = useState(null)
-  const [restaurantError, setRestaurantError] = useState(null)
-  const [tableResponse, setTableResponse] = useState(null)
-  const [tableError, setTableError] = useState(null)
+  const [showTableBanner, setShowTableBanner] = useState(true)
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
     const rawRestaurantId = params.get('restaurant_id');
     const rawTableId = params.get('table_id');
 
-    if (!rawRestaurantId) {
+    const decodedRestaurantId = rawRestaurantId ? decodeURIComponent(rawRestaurantId) : null;
+    const normalizedRestaurantId = decodedRestaurantId ? decodedRestaurantId.split('/')[0] : null;
+
+    const decodedTableId = rawTableId ? decodeURIComponent(rawTableId) : undefined;
+    const normalizedTableId = decodedTableId ? decodedTableId.split('/').pop() : undefined;
+
+    const identifiers = {};
+    if (normalizedRestaurantId) {
+      identifiers.restaurantId = normalizedRestaurantId;
+    }
+    if (normalizedTableId !== undefined) {
+      identifiers.tableId = normalizedTableId;
+    }
+
+    if (Object.keys(identifiers).length > 0) {
+      setIdentifiers(identifiers);
+    }
+  }, [location.search, setIdentifiers]);
+
+  useEffect(() => {
+    if (!restaurantId && !tableId) {
       return;
     }
 
-    const decodedRestaurantId = decodeURIComponent(rawRestaurantId);
-    const normalizedRestaurantId = decodedRestaurantId.split('/')[0];
-
-    const decodedTableId = rawTableId ? decodeURIComponent(rawTableId) : null;
-    const normalizedTableId = decodedTableId ? decodedTableId.split('/').pop() : null;
-
-    if (!normalizedRestaurantId) {
-      console.warn('Unable to derive restaurant id from query params:', rawRestaurantId);
-      return;
+    const params = new URLSearchParams(location.search);
+    if (!params.get('restaurant_id') && restaurantId) {
+      params.set('restaurant_id', restaurantId);
+    }
+    if (!params.get('table_id') && tableId) {
+      params.set('table_id', tableId);
     }
 
-    const fetchRestaurantData = async () => {
-      try {
-        const apiResponse = await fetchRestaurantMenuById(normalizedRestaurantId);
-        setRestaurantResponse(apiResponse);
-        setRestaurantError(null);
-      } catch (error) {
-        setRestaurantError(error);
-      }
-    };
-
-    fetchRestaurantData();
-
-    if (normalizedTableId) {
-      const fetchTableData = async () => {
-        try {
-          const apiResponse = await fetchTableDetails(normalizedRestaurantId, normalizedTableId);
-          setTableResponse(apiResponse);
-          setTableError(null);
-        } catch (error) {
-          setTableError(error);
-        }
-      };
-
-      fetchTableData();
-    } else {
-      setTableResponse(null);
-      setTableError(null);
+    const newSearch = params.toString();
+    const currentSearch = location.search.startsWith('?') ? location.search.slice(1) : location.search;
+    if (newSearch && newSearch !== currentSearch) {
+      navigate({ pathname: location.pathname, search: `?${newSearch}` }, { replace: true, state: location.state });
     }
-  }, [location.search]);
+  }, [restaurantId, tableId, location.pathname, location.search, location.state, navigate]);
 
   useEffect(() => {
     if (restaurantResponse) {
@@ -118,7 +120,7 @@ const DigitalMenu = () => {
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      const categoryId = menuData.categories.find(cat => 
+      const categoryId = menuData.categories.find(cat =>
         cat.name.toLowerCase() === selectedCategory.toLowerCase()
       )?.id
       items = items.filter(item => item.categoryId === categoryId)
@@ -147,56 +149,85 @@ const DigitalMenu = () => {
     setSelectedProduct(null)
   }
 
+  const tableData = tableResponse?.data ?? null;
+  const tableStatusColor = tableData?.status === 'available' ? 'text-emerald-400' : 'text-amber-400';
+  const reservationColor = tableData?.reservedStatus ? 'text-rose-400' : 'text-emerald-400';
+
+  useEffect(() => {
+    if (tableData) {
+      setShowTableBanner(true);
+    }
+  }, [tableData]);
+
   return (
     <div className="digital-menu">
       <div className="menu-container max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
-        <MenuNavbar restaurant={menuData.restaurant} restaurantResponse={restaurantResponse}/>
+        <MenuNavbar restaurant={menuData.restaurant} restaurantResponse={restaurantResponse} />
 
-        {tableResponse?.data && (
-          <section className="mt-4 mb-6 rounded-2xl border border-sky-500/20 bg-sky-500/10 p-4 sm:p-6 text-slate-900 shadow-sm backdrop-blur-xl">
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-              <div className="space-y-1">
-                <div className="inline-flex items-center gap-2 rounded-full border border-sky-400/30 bg-white/70 px-3 py-1 text-xs font-semibold uppercase tracking-widest text-sky-700 shadow-sm">
-                  <span>Table #{tableResponse.data.tableNumber}</span>
-                  <span className="inline-flex items-center gap-1 text-[10px] font-medium text-slate-500">
-                    {tableResponse.data.location}
-                  </span>
-                </div>
-                <h2 className="text-lg font-semibold text-slate-900 sm:text-xl md:text-2xl">
-                  Reserved table details
-                </h2>
-                <p className="text-sm text-slate-600">
-                  Seating capacity for {tableResponse.data.capacity} guests · Status: <span className="font-semibold capitalize">{tableResponse.data.status}</span>
-                </p>
-              </div>
-              <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-                <div className="rounded-xl bg-white/80 px-4 py-3 text-center shadow">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Capacity</p>
-                  <p className="text-lg font-semibold text-slate-900">{tableResponse.data.capacity}</p>
-                </div>
-                <div className="rounded-xl bg-white/80 px-4 py-3 text-center shadow">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Status</p>
-                  <p className={`text-lg font-semibold capitalize ${tableResponse.data.status === 'available' ? 'text-emerald-600' : 'text-amber-600'}`}>
-                    {tableResponse.data.status}
+        {tableData && showTableBanner && (
+          <div className="fixed bottom-4 right-4 z-40 w-[85vw] max-w-xs sm:max-w-sm pointer-events-none sm:bottom-6 sm:right-6">
+            <section className="pointer-events-auto relative overflow-hidden rounded-2xl border border-slate-900/30 bg-slate-900/90 text-white shadow-2xl backdrop-blur">
+              <button
+                type="button"
+                onClick={() => setShowTableBanner(false)}
+                className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/15 text-xs font-semibold text-white transition hover:bg-white/30"
+                aria-label="Dismiss table details"
+              >
+                ✕
+              </button>
+              <div className="space-y-3 p-4">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em]">
+                    <span>Table #{tableData.tableNumber}</span>
+                    <span className="text-[10px] font-medium normal-case tracking-normal text-white/70">{tableData.location}</span>
+                  </div>
+                  <h3 className="text-base font-semibold sm:text-lg">Reserved table details</h3>
+                  <p className="text-xs text-white/80 sm:text-sm">
+                    Seating capacity for {tableData.capacity} guests · Status{' '}
+                    <span className="font-semibold capitalize text-white">{tableData.status}</span>
                   </p>
                 </div>
-                <div className="rounded-xl bg-white/80 px-4 py-3 text-center shadow">
-                  <p className="text-[11px] uppercase tracking-[0.2em] text-slate-400">Reserved</p>
-                  <p className={`text-lg font-semibold ${tableResponse.data.reservedStatus ? 'text-rose-600' : 'text-emerald-600'}`}>
-                    {tableResponse.data.reservedStatus ? 'Yes' : 'No'}
-                  </p>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="rounded-xl border border-white/10 bg-white/10 p-2 text-center">
+                    <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Capacity</p>
+                    <p className="text-lg font-semibold">{tableData.capacity}</p>
+                  </div>
+                  <div className="rounded-xl border border-${tableData.status === 'available' ? 'emerald' : 'amber'}-400/30 bg-white/10 p-2 text-center">
+                    <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Status</p>
+                    <p className={`text-base font-semibold capitalize ${tableStatusColor}`}>{tableData.status}</p>
+                  </div>
+                  <div className="rounded-xl border border-white/10 bg-white/10 p-2 text-center">
+                    <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Reserved</p>
+                    <p className={`text-base font-semibold ${reservationColor}`}>{tableData.reservedStatus ? 'Yes' : 'No'}</p>
+                  </div>
                 </div>
+                <button
+                  type="button"
+                  onClick={() => document.getElementById('menu-grid')?.scrollIntoView({ behavior: 'smooth' })}
+                  className="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow-sm transition hover:from-sky-400 hover:to-indigo-400"
+                >
+                  Book this table
+                </button>
               </div>
-            </div>
-          </section>
+            </section>
+          </div>
         )}
 
-        <MenuHeader restaurant={menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse}/>
+        {tableData && !showTableBanner && (
+          <button
+            type="button"
+            onClick={() => setShowTableBanner(true)}
+            className="fixed bottom-4 right-4 z-30 inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-900/20 bg-sky-500 text-white shadow-xl transition hover:bg-sky-400 sm:bottom-6 sm:right-6"
+            aria-label="Show table details"
+          >
+            <MdOutlineTableBar />
+          </button>
+        )}
+
+        <MenuHeader restaurant={menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse} />
 
         <MenuFilters
           categories={menuData.categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           viewMode={viewMode}

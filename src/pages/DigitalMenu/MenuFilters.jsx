@@ -11,6 +11,9 @@ const MenuFilters = ({
   onViewModeChange,
   totalItems
 }) => {
+  const safeCategories = Array.isArray(categories) ? categories.filter(Boolean) : [];
+  const selectedCategoryValue = (selectedCategory ?? 'all').toLowerCase();
+
   return (
     <section
       id="menu-filters"
@@ -78,8 +81,9 @@ const MenuFilters = ({
           <span className="text-xs font-medium opacity-80">({totalItems})</span>
         </button>
 
-        {categories.map((category) => {
-          const active = selectedCategory.toLowerCase() === category.name.toLowerCase();
+        {safeCategories.map((category) => {
+          const categoryName = category?.name ?? '';
+          const active = categoryName && selectedCategoryValue === categoryName.toLowerCase();
           return (
             <button
               key={category.id}
@@ -88,11 +92,11 @@ const MenuFilters = ({
                   ? 'border-transparent bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-lg shadow-indigo-500/30'
                   : 'border-slate-200 bg-white text-slate-600 hover:border-sky-300 hover:text-sky-600'
               }`}
-              onClick={() => onCategoryChange(category.name)}
+              onClick={() => categoryName && onCategoryChange?.(categoryName)}
             >
               <span className="text-sm sm:text-base">{category.icon}</span>
-              {category.name}
-              <span className="text-xs font-medium opacity-80">({category.count})</span>
+              {categoryName || 'Category'}
+              <span className="text-xs font-medium opacity-80">({category.count ?? 0})</span>
             </button>
           );
         })}

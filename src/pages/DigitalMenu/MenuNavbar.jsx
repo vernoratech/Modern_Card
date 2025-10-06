@@ -113,6 +113,13 @@ console.log("restaurantResponse:",restaurantResponse);
         >
           Contact
         </button>
+        <button
+          type="button"
+          onClick={() => navigate('/about')}
+          className="rounded-full px-2 py-1 transition hover:bg-white/10 sm:px-3 sm:py-1.5"
+        >
+          About
+        </button>
       </div>
 
       {/* Action Buttons */}

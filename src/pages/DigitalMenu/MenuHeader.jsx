@@ -63,18 +63,6 @@ const MenuHeader = ({ restaurant, stats, restaurantResponse }) => {
         <p className="break-words">{contactNumber}</p>
         <p className="break-words">{address}</p>
       </div>
-
-      <div className="mt-4 sm:mt-5 md:mt-6 lg:mt-8 grid gap-2 sm:gap-3 md:gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3">
-        {highlights.map((highlight) => (
-          <div
-            key={highlight.label}
-            className="rounded-md sm:rounded-lg md:rounded-xl border border-white/10 p-2 sm:p-3 md:p-4 text-center text-slate-100 min-h-[80px] sm:min-h-[90px] flex flex-col justify-center"
-          >
-            <p className="text-base sm:text-lg md:text-xl font-semibold leading-tight">{highlight.value}</p>
-            <p className="mt-1 text-[10px] sm:text-xs uppercase tracking-[0.2em] text-slate-300">{highlight.label}</p>
-          </div>
-        ))}
-      </div>
     </section>
   );
 };
