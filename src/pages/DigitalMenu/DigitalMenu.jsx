@@ -25,6 +25,8 @@ const DigitalMenu = () => {
     tableId,
     tableResponse,
     tableError,
+    restaurantLoading,
+    tableLoading,
   } = useRestaurantData();
   const { addToCart } = useCart();
   const { addToast } = useToast();
@@ -34,6 +36,7 @@ const DigitalMenu = () => {
   const [filteredItems, setFilteredItems] = useState(menuData.menuItems)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showTableBanner, setShowTableBanner] = useState(true)
+  const [isInitializingFromUrl, setIsInitializingFromUrl] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -55,6 +58,7 @@ const DigitalMenu = () => {
     }
 
     if (Object.keys(identifiers).length > 0) {
+      setIsInitializingFromUrl(true);
       setIdentifiers(identifiers);
     }
   }, [location.search, setIdentifiers]);
@@ -202,9 +206,44 @@ const DigitalMenu = () => {
     }
   }, [tableData]);
 
+  useEffect(() => {
+    if (!isInitializingFromUrl) {
+      return;
+    }
+
+    if (restaurantLoading || tableLoading) {
+      return;
+    }
+
+    if (restaurantResponse || restaurantError || (!tableId && !tableLoading)) {
+      setIsInitializingFromUrl(false);
+    }
+  }, [isInitializingFromUrl, restaurantLoading, tableLoading, restaurantResponse, restaurantError, tableId]);
+
+  const hasRestaurantParam = Boolean(new URLSearchParams(location.search).get('restaurant_id'));
+  const isLoadingIdentifiers = (hasRestaurantParam || isInitializingFromUrl) &&
+    (restaurantLoading || tableLoading || (isInitializingFromUrl && !restaurantError && !restaurantResponse));
+
   return (
     <div className="digital-menu">
-      <div className="menu-container max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
+      {isLoadingIdentifiers ? (
+        <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-900 text-white">
+          <div className="flex flex-col items-center gap-6 rounded-3xl border border-white/10 bg-white/5 px-10 py-12 text-center shadow-[0_24px_50px_rgba(15,23,42,0.4)] backdrop-blur">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/70">
+              Fetching menu
+            </span>
+            <h1 className="text-2xl font-bold sm:text-3xl">Setting your table</h1>
+            <p className="max-w-md text-sm text-white/70 sm:text-base">
+              We're getting your personalized dining experience ready. Hold tight while we fetch the latest menu and table details.
+            </p>
+            <div className="relative h-16 w-16">
+              <div className="absolute inset-0 animate-ping rounded-full border-4 border-white/20"></div>
+              <div className="absolute inset-3 rounded-full border-4 border-white/40"></div>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="menu-container max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
         <MenuNavbar restaurant={menuData.restaurant} restaurantResponse={restaurantResponse} />
 
         {tableData && showTableBanner && (
@@ -302,7 +341,8 @@ const DigitalMenu = () => {
           onItemClick={handleProductClick}
           onAdd={handleShowcaseAdd}
         />
-      </div>
+        </div>
+      )}
     </div>
   )
 }

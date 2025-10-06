@@ -11,6 +11,7 @@ import DigitalMenu from './pages/DigitalMenu/DigitalMenu';
 import ProductDetails from './pages/ProductDetails/ProductDetails';
 import Cart from './pages/Cart/Cart';
 import Checkout from './pages/Checkout/Checkout';
+import OrderConfirmation from './pages/OrderConfirmation/OrderConfirmation.jsx';
 import RestaurantAboutPage from './pages/About/RestaurantAboutPage.jsx';
 import './App.css';
 
@@ -47,6 +48,7 @@ function App() {
                 <Route path="/product/:productId" element={<ProductDetails />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
+                <Route path="/order-confirmation" element={<OrderConfirmation />} />
                 <Route path="/about" element={<RestaurantAboutPage />} />
               </Routes>
               <SiteFooter />

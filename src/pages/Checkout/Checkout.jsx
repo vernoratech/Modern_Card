@@ -8,15 +8,9 @@ const Checkout = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    firstName: '',
-    lastName: '',
+    fullName: '',
     email: '',
     phone: '',
-    address: '',
-    city: '',
-    state: '',
-    zipCode: '',
-    deliveryInstructions: '',
     paymentMethod: 'card',
     cardNumber: '',
     expiryDate: '',
@@ -45,17 +39,11 @@ const Checkout = () => {
     const newErrors = {};
 
     // Required fields
-    if (!formData.firstName.trim()) newErrors.firstName = 'First name is required';
-    if (!formData.lastName.trim()) newErrors.lastName = 'Last name is required';
+    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
     if (!formData.email.trim()) newErrors.email = 'Email is required';
     else if (!/\S+@\S+\.\S+/.test(formData.email)) newErrors.email = 'Please enter a valid email';
 
     if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
-    if (!formData.address.trim()) newErrors.address = 'Address is required';
-    if (!formData.city.trim()) newErrors.city = 'City is required';
-    if (!formData.state.trim()) newErrors.state = 'State is required';
-    if (!formData.zipCode.trim()) newErrors.zipCode = 'ZIP code is required';
-
     // Payment validation for card
     if (formData.paymentMethod === 'card') {
       if (!formData.cardNumber.trim()) newErrors.cardNumber = 'Card number is required';
@@ -82,8 +70,24 @@ const Checkout = () => {
       await new Promise(resolve => setTimeout(resolve, 2000));
 
       // Clear cart and redirect to success page
+      const orderDetails = {
+        orderId: `ORD-${Date.now().toString().slice(-6)}`,
+        placedAt: Date.now(),
+        totals: {
+          subtotal,
+          deliveryFee,
+          tax,
+          finalTotal,
+        },
+        items,
+        fullName: formData.fullName,
+        email: formData.email,
+        phone: formData.phone,
+        paymentMethod: formData.paymentMethod,
+      };
+
       clearCart();
-      navigate('/order-confirmation');
+      navigate('/order-confirmation', { state: orderDetails });
     } catch (error) {
       console.error('Order submission failed:', error);
     } finally {
@@ -129,34 +133,19 @@ const Checkout = () => {
             <div className="checkout-section">
               <h2 className="section-title">Contact Information</h2>
               <div className="form-grid">
-                <div className="form-group">
-                  <label htmlFor="firstName" className="form-label">
-                    First Name *
+                <div className="form-group full-width">
+                  <label htmlFor="fullName" className="form-label">
+                    Full Name *
                   </label>
                   <input
                     type="text"
-                    id="firstName"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    className={`form-input ${errors.firstName ? 'error' : ''}`}
-                    placeholder="Enter your first name"
+                    id="fullName"
+                    value={formData.fullName}
+                    onChange={(e) => handleInputChange('fullName', e.target.value)}
+                    className={`form-input ${errors.fullName ? 'error' : ''}`}
+                    placeholder="Enter your full name"
                   />
-                  {errors.firstName && <span className="error-message">{errors.firstName}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="lastName" className="form-label">
-                    Last Name *
-                  </label>
-                  <input
-                    type="text"
-                    id="lastName"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    className={`form-input ${errors.lastName ? 'error' : ''}`}
-                    placeholder="Enter your last name"
-                  />
-                  {errors.lastName && <span className="error-message">{errors.lastName}</span>}
+                  {errors.fullName && <span className="error-message">{errors.fullName}</span>}
                 </div>
 
                 <div className="form-group">
@@ -191,86 +180,6 @@ const Checkout = () => {
               </div>
             </div>
 
-            {/* Delivery Information */}
-            <div className="checkout-section">
-              <h2 className="section-title">Delivery Address</h2>
-              <div className="form-grid">
-                <div className="form-group full-width">
-                  <label htmlFor="address" className="form-label">
-                    Street Address *
-                  </label>
-                  <input
-                    type="text"
-                    id="address"
-                    value={formData.address}
-                    onChange={(e) => handleInputChange('address', e.target.value)}
-                    className={`form-input ${errors.address ? 'error' : ''}`}
-                    placeholder="Enter your street address"
-                  />
-                  {errors.address && <span className="error-message">{errors.address}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="city" className="form-label">
-                    City *
-                  </label>
-                  <input
-                    type="text"
-                    id="city"
-                    value={formData.city}
-                    onChange={(e) => handleInputChange('city', e.target.value)}
-                    className={`form-input ${errors.city ? 'error' : ''}`}
-                    placeholder="Enter your city"
-                  />
-                  {errors.city && <span className="error-message">{errors.city}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="state" className="form-label">
-                    State *
-                  </label>
-                  <input
-                    type="text"
-                    id="state"
-                    value={formData.state}
-                    onChange={(e) => handleInputChange('state', e.target.value)}
-                    className={`form-input ${errors.state ? 'error' : ''}`}
-                    placeholder="Enter your state"
-                  />
-                  {errors.state && <span className="error-message">{errors.state}</span>}
-                </div>
-
-                <div className="form-group">
-                  <label htmlFor="zipCode" className="form-label">
-                    ZIP Code *
-                  </label>
-                  <input
-                    type="text"
-                    id="zipCode"
-                    value={formData.zipCode}
-                    onChange={(e) => handleInputChange('zipCode', e.target.value)}
-                    className={`form-input ${errors.zipCode ? 'error' : ''}`}
-                    placeholder="Enter your ZIP code"
-                  />
-                  {errors.zipCode && <span className="error-message">{errors.zipCode}</span>}
-                </div>
-              </div>
-
-              <div className="form-group">
-                <label htmlFor="deliveryInstructions" className="form-label">
-                  Delivery Instructions (Optional)
-                </label>
-                <textarea
-                  id="deliveryInstructions"
-                  value={formData.deliveryInstructions}
-                  onChange={(e) => handleInputChange('deliveryInstructions', e.target.value)}
-                  className="form-textarea"
-                  placeholder="Any special delivery instructions..."
-                  rows="3"
-                />
-              </div>
-            </div>
-
             {/* Payment Information */}
             <div className="checkout-section">
               <h2 className="section-title">Payment Method</h2>
@@ -284,10 +193,10 @@ const Checkout = () => {
                     checked={formData.paymentMethod === 'card'}
                     onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
                   />
-                  <span className="payment-method-label">Credit/Debit Card</span>
+                  <span className="payment-method-label">UPI/Credit/Debit Card</span>
                 </label>
 
-                <label className="payment-method">
+                {/* <label className="payment-method">
                   <input
                     type="radio"
                     name="paymentMethod"
@@ -296,7 +205,7 @@ const Checkout = () => {
                     onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
                   />
                   <span className="payment-method-label">PayPal</span>
-                </label>
+                </label> */}
 
                 <label className="payment-method">
                   <input
@@ -306,7 +215,7 @@ const Checkout = () => {
                     checked={formData.paymentMethod === 'cash'}
                     onChange={(e) => handleInputChange('paymentMethod', e.target.value)}
                   />
-                  <span className="payment-method-label">Cash on Delivery</span>
+                  <span className="payment-method-label">Call The Waiter & Pay Later</span>
                 </label>
               </div>
 
