@@ -8,6 +8,7 @@ import ToastContainer from './components/ui/ToastContainer.jsx';
 import SiteFooter from './components/layout/SiteFooter.jsx';
 import { useToast } from './context/ToastContext.jsx';
 import DigitalMenu from './pages/DigitalMenu/DigitalMenu';
+import ViewAllMenu from './pages/DigitalMenu/ViewAllMenu.jsx';
 import ProductDetails from './pages/ProductDetails/ProductDetails';
 import Cart from './pages/Cart/Cart';
 import Checkout from './pages/Checkout/Checkout';
@@ -45,6 +46,7 @@ function App() {
             <div className="App">
               <Routes>
                 <Route path="/" element={<DigitalMenu />} />
+                <Route path="/menu" element={<ViewAllMenu />} />
                 <Route path="/product/:productId" element={<ProductDetails />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />

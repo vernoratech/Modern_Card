@@ -1,5 +1,6 @@
 // src/pages/DigitalMenu/MenuHorizontalShowcase.jsx
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const MenuHorizontalShowcase = ({
   title = 'Handpicked for you',
@@ -7,10 +8,23 @@ const MenuHorizontalShowcase = ({
   items = [],
   onAdd,
   onItemClick,
+  viewAllCategory,
 }) => {
+  const navigate = useNavigate();
+
   if (!Array.isArray(items) || items.length === 0) {
     return null;
   }
+
+  const handleViewAll = () => {
+    const params = new URLSearchParams();
+    if (viewAllCategory && viewAllCategory !== 'all') {
+      params.set('category', viewAllCategory);
+    }
+
+    const search = params.toString();
+    navigate(`/menu${search ? `?${search}` : ''}`);
+  };
 
   return (
     <section data-showcase className="mt-10 sm:mt-12">
@@ -19,9 +33,13 @@ const MenuHorizontalShowcase = ({
           <h2 className="text-lg font-semibold text-slate-900 sm:text-xl">{title}</h2>
           <p className="text-xs text-slate-500 sm:text-sm">{subtitle}</p>
         </div>
-        <a href="#menu-grid" className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-600 transition hover:text-sky-500">
+        <button
+          type="button"
+          onClick={handleViewAll}
+          className="text-xs font-semibold uppercase tracking-[0.25em] text-sky-600 transition hover:text-sky-500 cursor-pointer"
+        >
           View all
-        </a>
+        </button>
       </div>
 
       <div className="relative mt-5">
@@ -51,13 +69,25 @@ const MenuHorizontalShowcase = ({
                   <span className="text-sm font-bold text-slate-900">₹{item.price}</span>
                   <span className="text-[11px] text-emerald-500 font-semibold">★ {item.rating ?? '4.7'}</span>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => onAdd?.(item)}
-                  className="mt-1 inline-flex items-center justify-center rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-400"
-                >
-                  Add
-                </button>
+                <div className="mt-2 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onItemClick?.(item);
+                      navigate(`/product/${item.id}`);
+                    }}
+                    className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-800 cursor-pointer"
+                  >
+                    View Details
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onAdd?.(item)}
+                    className="inline-flex flex-1 items-center justify-center rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-400 cursor-pointer"
+                  >
+                    Add
+                  </button>
+                </div>
               </div>
             </article>
           ))}

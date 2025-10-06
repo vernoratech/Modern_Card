@@ -340,6 +340,31 @@ const DigitalMenu = () => {
           items={showcaseItems}
           onItemClick={handleProductClick}
           onAdd={handleShowcaseAdd}
+          viewAllCategory="all"
+        />
+        <MenuHorizontalShowcase
+          title="Fresh off the grill"
+          subtitle="Hot picks sizzling straight from our kitchen"
+          items={showcaseItems}
+          onItemClick={handleProductClick}
+          onAdd={handleShowcaseAdd}
+          viewAllCategory="main course"
+        />
+        <MenuHorizontalShowcase
+          title="Chef's cravings"
+          subtitle="Specially curated plates for your appetite"
+          items={showcaseItems}
+          onItemClick={handleProductClick}
+          onAdd={handleShowcaseAdd}
+          viewAllCategory="starters"
+        />
+        <MenuHorizontalShowcase
+          title="Sweet tooth alerts"
+          subtitle="Dessert delights to wrap things up"
+          items={showcaseItems}
+          onItemClick={handleProductClick}
+          onAdd={handleShowcaseAdd}
+          viewAllCategory="desserts"
         />
         </div>
       )}
