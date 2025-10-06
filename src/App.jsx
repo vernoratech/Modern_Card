@@ -21,9 +21,9 @@ const ToastBootstrapper = () => {
     if (!hasSeen) {
       addToast({
         type: 'info',
-        title: 'Welcome to Brijesh Fast Food',
-        message: 'Browse the menu and tap any dish to explore more or add to your cart.',
-        position: 'top-center',
+        title: 'Welcome to our digital menu',
+        message: 'Explore, view, and add to your cart.',
+        position: 'top',
         duration: 6000,
       });
       sessionStorage.setItem('welcomeToastShown', 'true');

@@ -19,7 +19,7 @@ const Toast = ({ toast, onRemove }) => {
 
   const getToastStyles = () => {
     const baseStyles = "flex items-start p-4 mb-3 rounded-lg shadow-lg border-l-4 max-w-md transition-all duration-300 transform"
-    
+
     const typeStyles = {
       success: "bg-white dark:bg-gray-800 border-green-500 text-gray-900 dark:text-white",
       error: "bg-white dark:bg-gray-800 border-red-500 text-gray-900 dark:text-white",
@@ -28,10 +28,10 @@ const Toast = ({ toast, onRemove }) => {
       loading: "bg-white dark:bg-gray-800 border-purple-500 text-gray-900 dark:text-white"
     }
 
-    const animationStyles = isRemoving 
-      ? "opacity-0 translate-x-full scale-95" 
-      : isVisible 
-        ? "opacity-100 translate-x-0 scale-100" 
+    const animationStyles = isRemoving
+      ? "opacity-0 translate-x-full scale-95"
+      : isVisible
+        ? "opacity-100 translate-x-0 scale-100"
         : "opacity-0 translate-x-full scale-95"
 
     return `${baseStyles} ${typeStyles[toast.type]} ${animationStyles}`
@@ -64,7 +64,7 @@ const Toast = ({ toast, onRemove }) => {
       <div className={`flex-shrink-0 text-lg ${getIconColor()}`}>
         {getIcon()}
       </div>
-      
+
       <div className="ml-3 flex-1">
         {toast.title && (
           <p className="text-sm font-semibold text-gray-900 dark:text-white">
