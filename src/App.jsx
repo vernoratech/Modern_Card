@@ -5,6 +5,7 @@ import { CartProvider } from './context/CartContext';
 import { RestaurantDataProvider } from './context/RestaurantDataContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
 import ToastContainer from './components/ui/ToastContainer.jsx';
+import SiteFooter from './components/layout/SiteFooter.jsx';
 import { useToast } from './context/ToastContext.jsx';
 import DigitalMenu from './pages/DigitalMenu/DigitalMenu';
 import ProductDetails from './pages/ProductDetails/ProductDetails';
@@ -48,6 +49,7 @@ function App() {
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/about" element={<RestaurantAboutPage />} />
               </Routes>
+              <SiteFooter />
               <ToastContainer />
             </div>
           </Router>

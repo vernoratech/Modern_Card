@@ -62,8 +62,8 @@ const MenuHorizontalShowcase = ({
             </article>
           ))}
         </div>
-        <div className="pointer-events-none absolute inset-y-1 left-0 w-10 bg-gradient-to-r from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
-        <div className="pointer-events-none absolute inset-y-1 right-0 w-10 bg-gradient-to-l from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
+        <div className="pointer-events-none absolute inset-y-1 left-0 w-3 bg-gradient-to-r from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
+        <div className="pointer-events-none absolute inset-y-1 right-0 w-3 bg-gradient-to-l from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
         <style>{`
           [data-showcase-track]::-webkit-scrollbar { display: none; }
           [data-showcase-track] { scrollbar-width: none; }

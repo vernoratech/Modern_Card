@@ -53,8 +53,8 @@ const MenuGrid = ({ items, onProductClick }) => {
           </div>
         ))}
       </div>
-      <div className="pointer-events-none absolute inset-y-0 left-0 w-10 bg-gradient-to-r from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
-      <div className="pointer-events-none absolute inset-y-0 right-0 w-10 bg-gradient-to-l from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 left-0 w-3 bg-gradient-to-r from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
+      <div className="pointer-events-none absolute inset-y-0 right-0 w-3 bg-gradient-to-l from-[#f8fafc] via-[#f8fafc]/85 to-transparent" />
       <style>{`
         #menu-grid > div::-webkit-scrollbar { display: none; }
         #menu-grid > div { scrollbar-width: none; }
