@@ -57,16 +57,16 @@ const MenuHorizontalShowcase = ({
                 className="relative h-32 cursor-pointer overflow-hidden rounded-t-3xl"
                 onClick={() => onItemClick?.(item)}
               >
-                <img src={item.image} alt={item.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <img src={item.image} alt={item.name || item.itemName} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 <span className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-semibold text-slate-700 shadow-sm">
                   {item.tag ?? 'Chef pick'}
                 </span>
               </div>
               <div className="flex flex-col gap-2 p-3">
-                <h3 className="line-clamp-2 text-sm font-semibold text-slate-900">{item.name}</h3>
+                <h3 className="line-clamp-2 text-sm font-semibold text-slate-900">{item.name || item.itemName}</h3>
                 <p className="text-xs text-slate-500 line-clamp-2">{item.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-slate-900">₹{item.price}</span>
+                  <span className="text-sm font-bold text-slate-900">{item.currency || '₹'}{item.price}</span>
                   <span className="text-[11px] text-emerald-500 font-semibold">★ {item.rating ?? '4.7'}</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">

@@ -34,8 +34,8 @@ const ProductModal = ({ product, onClose, restaurant }) => {
 
   const handleAddToCart = () => {
     addToCart({
-      id: product.id,
-      name: product.name,
+      id: product.id || product._id,
+      name: product.name || product.itemName,
       price: product.price,
       image: product.image,
       category: product.category,
@@ -47,7 +47,7 @@ const ProductModal = ({ product, onClose, restaurant }) => {
     addToast({
       type: 'success',
       title: 'Added to cart',
-      message: `${quantity} × ${product.name} added to your cart`,
+      message: `${quantity} × ${product.name || product.itemName} added to your cart`,
       position: 'bottom-right',
     });
     onClose();
@@ -78,11 +78,11 @@ const ProductModal = ({ product, onClose, restaurant }) => {
           <div className="modal-details p-4 sm:p-6 md:p-8">
             <div className="product-header flex flex-col sm:flex-row sm:justify-between sm:items-start gap-3 mb-4">
               <div className="flex-1">
-                <h2 className="product-name text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{product.name}</h2>
+                <h2 className="product-name text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{product.name || product.itemName}</h2>
                 <div className="price-section text-lg sm:text-xl font-semibold text-green-600">
-                  {product.currency}{product.price}
+                  {product.currency || '₹'}{product.price}
                   {product.originalPrice && (
-                    <span className="original-price ml-3 text-sm text-gray-400 line-through">{product.currency}{product.originalPrice}</span>
+                    <span className="original-price ml-3 text-sm text-gray-400 line-through">{product.currency || '₹'}{product.originalPrice}</span>
                   )}
                 </div>
               </div>
@@ -108,12 +108,12 @@ const ProductModal = ({ product, onClose, restaurant }) => {
               )}
               <div className="meta-item text-center">
                 <span className="meta-label block text-xs text-gray-500 mb-1">⭐ Rating</span>
-                <span className="meta-value block font-semibold text-gray-900">{product.rating} ({product.reviewCount})</span>
+                <span className="meta-value block font-semibold text-gray-900">{product.rating} ({product.reviewCount || 0})</span>
               </div>
             </div>
 
             {/* Tags */}
-            {product.tags.length > 0 && (
+            {product.tags && product.tags.length > 0 && (
               <div className="tags-section mb-6">
                 <h4 className="text-sm font-semibold text-gray-900 mb-3">Tags:</h4>
                 <div className="tags flex flex-wrap gap-2">
@@ -127,11 +127,13 @@ const ProductModal = ({ product, onClose, restaurant }) => {
             {/* Ingredients */}
             <div className="ingredients-section mb-6">
               <h4 className="text-sm font-semibold text-gray-900 mb-3">Ingredients:</h4>
-              <p className="ingredients text-sm text-gray-600 leading-relaxed">{product.ingredients.join(', ')}</p>
+              <p className="ingredients text-sm text-gray-600 leading-relaxed">
+                {product.ingredients && product.ingredients.length > 0 ? product.ingredients.join(', ') : 'No ingredients listed'}
+              </p>
             </div>
 
             {/* Allergens */}
-            {product.allergens.length > 0 && (
+            {product.allergens && product.allergens.length > 0 && (
               <div className="allergens-section mb-6">
                 <h4 className="text-sm font-semibold text-red-600 mb-3">⚠️ Allergens:</h4>
                 <p className="allergens text-sm text-red-600 leading-relaxed">{product.allergens.join(', ')}</p>
@@ -163,8 +165,8 @@ const ProductModal = ({ product, onClose, restaurant }) => {
                 disabled={!product.isAvailable}
                 onClick={handleAddToCart}
               >
-                {product.isAvailable
-                  ? `Add ${quantity} to Cart - ${product.currency}${getTotalPrice()}`
+                {product.isAvailable !== false
+                  ? `Add ${quantity} to Cart - ${product.currency || '₹'}${getTotalPrice()}`
                   : 'Currently Unavailable'
                 }
               </button>

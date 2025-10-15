@@ -1,6 +1,6 @@
 // src/context/RestaurantDataContext.jsx
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import { fetchRestaurantMenuById, fetchTableDetails } from '../services/restaurantService.js';
+import { fetchRestaurantMenuById, fetchTableDetails, fetchRestaurantMenuItems } from '../services/restaurantService.js';
 
 const RestaurantDataContext = createContext(null);
 
@@ -15,11 +15,18 @@ export const RestaurantDataProvider = ({ children }) => {
   const [tableError, setTableError] = useState(null);
   const [tableLoading, setTableLoading] = useState(false);
 
-  const setIdentifiers = useCallback(({ restaurantId: newRestaurantId, tableId: newTableId }) => {
+  const [restaurantMenuItemsId, setRestaurantMenuItemsId] = useState(null);
+  const [restaurantMenuItemsResponse, setRestaurantMenuItemsResponse] = useState(null);
+  const [restaurantMenuItemsError, setRestaurantMenuItemsError] = useState(null);
+  const [restaurantMenuItemsLoading, setRestaurantMenuItemsLoading] = useState(false);
+
+  const setIdentifiers = useCallback(({ restaurantId: newRestaurantId, tableId: newTableId, restaurantMenuItemsId: newRestaurantMenuItemsId }) => {
     setRestaurantId((prev) => newRestaurantId ?? prev);
     setTableId((prev) => (newTableId === undefined ? prev : newTableId));
+    setRestaurantMenuItemsId((prev) => (newRestaurantMenuItemsId === undefined ? prev : newRestaurantMenuItemsId));
   }, []);
 
+  //Restaurant Data fetch
   useEffect(() => {
     if (!restaurantId) {
       return;
@@ -54,6 +61,7 @@ export const RestaurantDataProvider = ({ children }) => {
     };
   }, [restaurantId]);
 
+  //Table Data fetch
   useEffect(() => {
     if (!restaurantId || !tableId) {
       setTableResponse(null);
@@ -91,6 +99,41 @@ export const RestaurantDataProvider = ({ children }) => {
     };
   }, [restaurantId, tableId]);
 
+  //Restaurant Menu Items fetch
+  useEffect(() => {
+    if (!restaurantId) {
+      return;
+    }
+
+    let isActive = true;
+    const loadRestaurantMenuItems = async () => {
+      try {
+        setRestaurantMenuItemsLoading(true);
+        const response = await fetchRestaurantMenuItems(restaurantId);
+        if (!isActive) {
+          return;
+        }
+        setRestaurantMenuItemsResponse(response);
+        setRestaurantMenuItemsError(null);
+      } catch (error) {
+        if (!isActive) {
+          return;
+        }
+        setRestaurantMenuItemsError(error);
+      } finally {
+        if (isActive) {
+          setRestaurantMenuItemsLoading(false);
+        }
+      }
+    };
+
+    loadRestaurantMenuItems();
+
+    return () => {
+      isActive = false;
+    };
+  }, [restaurantId]);
+
   const value = {
     restaurantId,
     restaurantResponse,
@@ -101,6 +144,10 @@ export const RestaurantDataProvider = ({ children }) => {
     tableError,
     tableLoading,
     setIdentifiers,
+    restaurantMenuItemsId,
+    restaurantMenuItemsResponse,
+    restaurantMenuItemsError,
+    restaurantMenuItemsLoading,
   };
 
   return (
