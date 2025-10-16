@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './Cart.css';
+import { TiArrowBackOutline } from 'react-icons/ti';
 
 const Cart = () => {
   const { items, total, itemCount, removeFromCart, updateQuantity, clearCart } = useCart();
@@ -23,8 +24,7 @@ const Cart = () => {
         <div className="cart-container">
           <div className="cart-nav">
             <Link to="/" className="cart-back-btn">
-              <span aria-hidden="true">←</span>
-              <span>Back to Menu</span>
+<span className="font-medium flex items-center gap-2"><TiArrowBackOutline className='text-2xl' /><span>Back to Menu</span></span>
             </Link>
           </div>
           <div className="cart-header">
@@ -54,8 +54,7 @@ const Cart = () => {
       <div className="cart-container">
         <div className="cart-nav">
           <Link to="/" className="cart-back-btn">
-            <span aria-hidden="true">←</span>
-            <span>Back to Menu</span>
+            <span className="font-medium flex items-center gap-2"><TiArrowBackOutline className='text-2xl' /><span>Back to Menu</span></span>
           </Link>
         </div>
 

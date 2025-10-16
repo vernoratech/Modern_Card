@@ -2,6 +2,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import RestaurantAbout from '../DigitalMenu/sections/RestaurantAbout.jsx';
+import { TiArrowBackOutline } from 'react-icons/ti';
 
 const RestaurantAboutPage = () => {
   return (
@@ -12,8 +13,7 @@ const RestaurantAboutPage = () => {
             to="/"
             className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold uppercase tracking-[0.3em] text-slate-600 shadow-sm transition hover:border-slate-300 hover:bg-white/80 sm:px-4 sm:py-2 sm:text-sm"
           >
-            <span className="text-base">←</span>
-            <span className="tracking-normal">Back to Menu</span>
+<span className="font-medium flex items-center gap-2"><TiArrowBackOutline className='text-2xl' /><span>Back to Menu</span></span>
           </Link>
         </div>
         <header className="mb-6 sm:mb-8 md:mb-10 flex flex-col gap-3 text-slate-800">

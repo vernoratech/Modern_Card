@@ -1,5 +1,7 @@
 // src/components/DigitalMenu/MenuFilters.jsx
 import React from 'react'
+import { BsSearchHeart } from 'react-icons/bs';
+import { LuUtensilsCrossed } from 'react-icons/lu';
 
 const MenuFilters = ({
   categories,
@@ -15,71 +17,120 @@ const MenuFilters = ({
   return (
     <section
       id="menu-filters"
-      className="mt-6 sm:mt-8 md:mt-10 rounded-2xl sm:rounded-3xl border border-slate-200/70 bg-white/90 p-4 sm:p-6 md:p-8 shadow-[0_24px_48px_rgba(15,23,42,0.08)] backdrop-blur"
+      className="relative mt-6 sm:mt-8 md:mt-10 rounded-3xl bg-gradient-to-br from-white via-white to-slate-50/80 p-6 sm:p-8 md:p-10 shadow-[0_32px_64px_rgba(15,23,42,0.12)] backdrop-blur-xl border border-white/60"
     >
-      <div className="flex flex-col gap-4 sm:gap-6 md:flex-row md:items-center md:justify-between">
-        <div className="relative flex-1 max-w-full">
-          <span className="pointer-events-none absolute left-3 sm:left-4 top-1/2 -translate-y-1/2 text-base sm:text-lg">🔍</span>
-          <input
-            type="text"
-            placeholder="Search dishes, ingredients..."
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full rounded-xl sm:rounded-2xl border border-slate-200 bg-slate-50/70 py-2.5 sm:py-3 pl-10 sm:pl-12 pr-10 sm:pr-12 text-sm sm:text-base font-medium text-slate-700 shadow-inner shadow-white/40 transition focus:border-sky-400 focus:bg-white focus:outline-none"
-          />
-          {searchQuery && (
-            <button
-              className="absolute right-2 sm:right-3 top-1/2 flex h-6 w-6 sm:h-8 sm:w-8 -translate-y-1/2 items-center justify-center rounded-full bg-slate-200 text-xs font-semibold text-slate-600 transition hover:bg-slate-300"
-              onClick={() => onSearchChange('')}
-            >
-              ✕
-            </button>
-          )}
+      {/* Decorative background elements */}
+      <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-sky-50/40 via-transparent to-indigo-50/40" />
+      <div className="absolute top-0 left-0 w-32 h-32 bg-gradient-to-br from-sky-200/20 to-transparent rounded-full blur-3xl" />
+      <div className="absolute bottom-0 right-0 w-40 h-40 bg-gradient-to-tl from-indigo-200/20 to-transparent rounded-full blur-3xl" />
+
+      <div className="relative">
+        {/* Header Section */}
+        <div className="mb-6 sm:mb-8">
+          <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-clip-text text-transparent mb-2">
+            Discover Delicious Dishes
+          </h2>
+          <p className="text-sm sm:text-base text-slate-600">
+            Search through our curated collection of mouthwatering meals
+          </p>
         </div>
 
-        <div className="flex w-full items-center justify-end gap-2 sm:gap-3 text-xs sm:text-sm font-semibold text-slate-600 md:w-auto">
-          <span className="rounded-full border border-slate-200 px-3 sm:px-4 py-1.5 sm:py-2 text-slate-700">
-            {totalItems} items found
-          </span>
+        <div className="flex flex-col gap-6 sm:gap-8 md:flex-row md:items-center md:justify-between">
+          {/* Enhanced Search Bar */}
+          <div className="relative flex-1 max-w-full">
+            <div className="absolute inset-0 bg-gradient-to-r from-sky-400/10 to-indigo-400/10 rounded-2xl blur-lg" />
+            <div className="relative">
+
+              <input
+                type="text"
+                placeholder="Search dishes, ingredients, cuisine..."
+                value={searchQuery}
+                onChange={(e) => onSearchChange(e.target.value)}
+                className="w-full rounded-2xl border-0 bg-white/80 backdrop-blur-sm py-3.5 sm:py-4 pl-12 sm:pl-14 pr-12 sm:pr-14 text-sm sm:text-base font-medium text-slate-700 shadow-lg shadow-slate-900/10 transition-all duration-300 focus:bg-white focus:shadow-xl focus:shadow-sky-500/20 focus:outline-none focus:ring-2 focus:ring-sky-400/50 placeholder:text-slate-500"
+              />
+              {searchQuery && (
+                <button
+                  className="absolute right-3 sm:right-4 top-1/2 flex h-5 w-5 sm:h-6 sm:w-6 -translate-y-1/2 items-center justify-center rounded-full bg-gradient-to-r from-slate-400 to-slate-500 text-sm font-semibold text-white shadow-lg transition-all hover:from-slate-500 hover:to-slate-600 hover:scale-105"
+                  onClick={() => onSearchChange('')}
+                >
+                  <LuUtensilsCrossed />
+                </button>
+              )}
+              <span className="absolute left-4 sm:left-5 top-1/2 -translate-y-1/2 text-lg sm:text-xl text-slate-500"><BsSearchHeart /></span>
+            </div>
+          </div>
+
+          {/* Enhanced Items Counter */}
+          { <div className="flex w-full items-center justify-end md:w-auto">
+            <div className="rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 px-4 sm:px-5 py-2.5 sm:py-3 shadow-lg shadow-emerald-500/10">
+              <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                {totalItems} items found
+              </span>
+            </div>
+          </div>}
         </div>
-      </div>
 
-      <div
-        id="menu-categories"
-        className="mt-4 sm:mt-6 flex w-full snap-x gap-2 sm:gap-3 overflow-x-auto pb-3 sm:pb-4"
-      >
-        <button
-          className={`flex snap-start items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl border px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold transition ${
-            selectedCategory === 'all'
-              ? 'border-transparent bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-lg shadow-indigo-500/30'
-              : 'border-slate-200 bg-white text-slate-600 hover:border-sky-300 hover:text-sky-600'
-          }`}
-          onClick={() => onCategoryChange('all')}
-        >
-          <span className="text-sm sm:text-base">🍽️</span>
-          All Items
-          <span className="text-xs font-medium opacity-80">({totalItems})</span>
-        </button>
+        {/* Enhanced Category Filters */}
+        <div className="mt-2 sm:mt-3">
+          <h3 className="text-sm sm:text-base font-semibold text-slate-700 mb-4 sm:mb-5">
+            Browse by Category
+          </h3>
 
-        {safeCategories.map((category) => {
-          const categoryName = category?.name ?? '';
-          const active = categoryName && selectedCategoryValue === categoryName.toLowerCase();
-          return (
+          <div
+            id="menu-categories"
+            className="flex w-full snap-x gap-3 sm:gap-4 overflow-x-auto pb-4 sm:pb-5 scrollbar-hide"
+            style={{
+              scrollbarWidth: 'none',
+              msOverflowStyle: 'none',
+              WebkitOverflowScrolling: 'touch'
+            }}
+          >
+            {/* All Items Button - Dynamic Width */}
             <button
-              key={category.id}
-              className={`flex snap-start items-center gap-1.5 sm:gap-2 rounded-xl sm:rounded-2xl border px-3 sm:px-5 py-2 sm:py-3 text-xs sm:text-sm font-semibold transition ${
-                active
-                  ? 'border-transparent bg-gradient-to-r from-sky-500 to-indigo-500 text-white shadow-lg shadow-indigo-500/30'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-sky-300 hover:text-sky-600'
-              }`}
-              onClick={() => categoryName && onCategoryChange?.(categoryName)}
+              className={`group relative flex shrink-0 snap-start items-center justify-center gap-2 sm:gap-3 rounded-2xl border px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${selectedCategory === 'all'
+                  ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
+                  : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
+                }`}
+              onClick={() => onCategoryChange('all')}
             >
-              <span className="text-sm sm:text-base">{category.icon}</span>
-              {categoryName || 'Category'}
-              <span className="text-xs font-medium opacity-80">({category.count ?? 0})</span>
+              <span className={`text-base sm:text-lg transition-transform group-hover:scale-110 ${selectedCategory === 'all' ? 'animate-pulse' : ''}`}>
+                🍽️
+              </span>
+              <div className="flex items-center justify-center">
+                <span className="leading-tight whitespace-nowrap">All Items</span>
+              </div>
+              {selectedCategory === 'all' && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping" />
+              )}
             </button>
-          );
-        })}
+
+            {/* Category Buttons - Dynamic Width */}
+            {safeCategories.map((category) => {
+              const categoryName = category?.name ?? '';
+              const active = categoryName && selectedCategoryValue === categoryName.toLowerCase();
+              return (
+                <button
+                  key={category.id}
+                  className={`group relative flex shrink-0 snap-start items-center gap-2 sm:gap-3 rounded-2xl border px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${active
+                      ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
+                      : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
+                    }`}
+                  onClick={() => categoryName && onCategoryChange?.(categoryName)}
+                >
+                  <span className={`text-base sm:text-lg transition-transform group-hover:scale-110 ${active ? 'animate-pulse' : ''}`}>
+                    {category.icon}
+                  </span>
+                  <div className="flex items-center justify-center">
+                    <span className="leading-tight whitespace-nowrap">{categoryName || 'Category'}</span>
+                  </div>
+                  {active && (
+                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
     </section>
   )

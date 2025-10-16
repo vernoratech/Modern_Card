@@ -1,9 +1,29 @@
 // src/components/layout/SiteFooter.jsx
 import React from 'react';
+import { useRestaurantData } from '../../context/RestaurantDataContext.jsx';
 
 const currentYear = new Date().getFullYear();
 
 const SiteFooter = () => {
+  const {
+    restaurantLoading,
+    restaurantError,
+    tableLoading,
+    tableError,
+    restaurantMenuItemsLoading,
+    restaurantMenuItemsError
+  } = useRestaurantData();
+
+  // Check if all API calls are successful (not loading and no errors)
+  const allApisSuccessful = !restaurantLoading && !restaurantError &&
+    !tableLoading && !tableError &&
+    !restaurantMenuItemsLoading && !restaurantMenuItemsError;
+
+  // Only render footer when all APIs are successful
+  if (!allApisSuccessful) {
+    return null;
+  }
+
   return (
     <footer className="relative overflow-hidden bg-[#f8fafc] text-slate-800 mb-2">
       <div className="pointer-events-none absolute inset-0 "></div>

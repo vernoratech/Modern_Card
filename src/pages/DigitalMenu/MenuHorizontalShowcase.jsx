@@ -76,14 +76,14 @@ const MenuHorizontalShowcase = ({
                       onItemClick?.(item);
                       navigate(`/product/${item._id || item.id}`);
                     }}
-                    className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-800 cursor-pointer"
+                    className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-[9px] font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-800 cursor-pointer"
                   >
                     View Details
                   </button>
                   <button
                     type="button"
                     onClick={() => onAdd?.(item)}
-                    className="inline-flex flex-1 items-center justify-center rounded-full bg-emerald-500 px-3 py-1.5 text-xs font-semibold text-white shadow-sm transition hover:bg-emerald-400 cursor-pointer"
+                    className="inline-flex flex-1 items-center justify-center rounded-full bg-emerald-500 px-3 py-1.5 text-[9px] font-semibold text-white shadow-sm transition hover:bg-emerald-400 cursor-pointer"
                   >
                     Add
                   </button>
