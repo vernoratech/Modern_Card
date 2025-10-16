@@ -258,44 +258,41 @@ const DigitalMenu = () => {
   return (
     <div className="digital-menu">
       {isLoadingIdentifiers ? (
-        <div class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white antialiased">
-          <div class="group relative flex flex-col items-center gap-9 rounded-[2.5rem] border border-zinc-800/50 bg-zinc-900/40 px-16 py-20 text-center shadow-2xl backdrop-blur-3xl transition-all duration-700 hover:border-zinc-700/50 hover:shadow-[0_0_60px_-15px_rgba(255,255,255,0.1)]">
+        <div className="flex min-h-screen flex-col items-center justify-center bg-black text-white">
+          <div className="relative flex flex-col items-center gap-10 rounded-[3rem] border border-white/[0.06] bg-white/[0.02] px-24 py-28 text-center backdrop-blur-3xl transition-all duration-1000 hover:bg-white/[0.03]">
 
-
-            <span class="inline-flex items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-800/50 px-5 py-2 text-[10px] font-bold tracking-[0.3em] text-zinc-400 uppercase backdrop-blur-sm transition-all duration-500 group-hover:border-zinc-600 group-hover:bg-zinc-700/50">
-              <span class="relative flex h-2 w-2">
-                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
-                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
-              </span>
-              Preparing
-            </span>
-
-
-            <h1 class="text-4xl font-black sm:text-5xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-400">
-              Setting your table
-            </h1>
-
-
-            <div class="flex flex-col gap-2 max-w-md text-sm text-zinc-400 sm:text-base">
-              <p class="transition-all duration-500 group-hover:text-zinc-300">
-                We're getting your personalized dining experience ready.
-              </p>
-              <p class="text-zinc-500 transition-all duration-500 delay-75 group-hover:text-zinc-400">
-                Hold tight while we fetch the latest menu and table details.
-              </p>
+            <div className="inline-flex items-center gap-2.5 rounded-full border border-white/10 bg-white/5 px-5 py-1.5 backdrop-blur-xl">
+              <svg className="h-3 w-3 animate-spin text-white/60" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="3"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              <span className="text-[9px] font-bold tracking-[0.35em] text-white/50 uppercase">Processing</span>
             </div>
 
-
-            <div class="relative h-16 w-16 mt-2">
-              <div class="absolute inset-0 rounded-full border-[3px] border-zinc-800"></div>
-              <div class="absolute inset-0 rounded-full border-[3px] border-transparent border-t-white border-r-white/60 animate-spin"></div>
-              <div class="absolute inset-3 rounded-full bg-zinc-800/50 backdrop-blur-sm"></div>
+            <div className="space-y-4">
+              <h1 className="text-4xl font-light tracking-tight">Setting your table</h1>
+              <div className="mx-auto h-px w-24 bg-gradient-to-r from-transparent via-white/30 to-transparent"></div>
             </div>
 
+            <p className="max-w-sm text-sm font-light leading-relaxed text-white/50">
+              Preparing your personalized dining experience
+            </p>
 
-            <span class="text-xs text-zinc-600 font-medium tracking-wide">This will only take a moment</span>
+            <div className="relative h-16 w-16">
+              <div className="absolute inset-0 animate-[spin_3s_linear_infinite] rounded-lg border-2 border-white/10"></div>
+              <div className="absolute inset-2 animate-[spin_2s_linear_infinite_reverse] rounded-lg border-2 border-white/20"></div>
+              <div className="absolute inset-4 animate-[spin_1.5s_linear_infinite] rounded-lg border-2 border-white/30"></div>
+            </div>
+
+            <div className="flex gap-2">
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/40"></span>
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/40" style={{ animationDelay: '0.2s' }}></span>
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/40" style={{ animationDelay: '0.4s' }}></span>
+              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-white/40" style={{ animationDelay: '0.6s' }}></span>
+            </div>
           </div>
         </div>
+
 
       ) : (
         <div className="menu-container max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
