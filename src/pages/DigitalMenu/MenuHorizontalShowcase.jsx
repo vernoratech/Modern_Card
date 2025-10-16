@@ -50,23 +50,23 @@ const MenuHorizontalShowcase = ({
         >
           {items.map((item) => (
             <article
-              key={item.id}
+              key={item._id || item.id}
               className="group snap-start w-48 flex-shrink-0 rounded-3xl border border-slate-200/60 bg-white/95 shadow-[0_18px_36px_rgba(15,23,42,0.12)] backdrop-blur transition-transform duration-300 hover:-translate-y-1.5 hover:shadow-[0_26px_50px_rgba(15,23,42,0.18)] sm:w-56 md:w-60"
             >
               <div
                 className="relative h-32 cursor-pointer overflow-hidden rounded-t-3xl"
                 onClick={() => onItemClick?.(item)}
               >
-                <img src={item.image} alt={item.name} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                <img src={Array.isArray(item.image) ? item.image[0] : item.image || '/placeholder-image.jpg'} alt={item.name || item.itemName} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
                 <span className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-semibold text-slate-700 shadow-sm">
                   {item.tag ?? 'Chef pick'}
                 </span>
               </div>
               <div className="flex flex-col gap-2 p-3">
-                <h3 className="line-clamp-2 text-sm font-semibold text-slate-900">{item.name}</h3>
+                <h3 className="line-clamp-2 text-sm font-semibold text-slate-900">{item.name || item.itemName}</h3>
                 <p className="text-xs text-slate-500 line-clamp-2">{item.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-slate-900">₹{item.price}</span>
+                  <span className="text-sm font-bold text-slate-900">{item.currency || '₹'}{item.price}</span>
                   <span className="text-[11px] text-emerald-500 font-semibold">★ {item.rating ?? '4.7'}</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">
@@ -74,7 +74,7 @@ const MenuHorizontalShowcase = ({
                     type="button"
                     onClick={() => {
                       onItemClick?.(item);
-                      navigate(`/product/${item.id}`);
+                      navigate(`/product/${item._id || item.id}`);
                     }}
                     className="inline-flex flex-1 items-center justify-center rounded-full border border-slate-200 bg-white px-3 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-slate-300 hover:text-slate-800 cursor-pointer"
                   >

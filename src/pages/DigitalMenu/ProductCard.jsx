@@ -45,10 +45,10 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
   const handleAddToCart = (e) => {
     e.stopPropagation();
     addToCart({
-      id: product.id,
-      name: product.name,
+      id: product.id || product._id,
+      name: product.name || product.itemName,
       price: product.price,
-      image: product.image,
+      image: product.image?.[0] || '/placeholder-image.jpg',
       category: product.category,
       isVeg: product.isVeg,
       isVegan: product.isVegan,
@@ -58,14 +58,14 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
     addToast({
       type: 'success',
       title: 'Added to cart',
-      message: `${product.name} has been added to your cart`,
+      message: `${product.name || product.itemName} has been added to your cart`,
       position: 'bottom-right',
     });
   };
 
   const handleViewDetails = (e) => {
     e.stopPropagation();
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product.id || product._id}`);
   };
 
   const renderActions = () => (
@@ -97,7 +97,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
     if (onProductClick) {
       onProductClick(product);
     } else {
-      navigate(`/product/${product.id}`);
+      navigate(`/product/${product.id || product._id}`);
     }
   };
 
@@ -139,7 +139,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
   };
 
   const renderOverlay = () => {
-    if (!product.isAvailable) {
+    if (product.isAvailable === false || product.isActive === 0) {
       return (
         <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center rounded-xl">
           <span className="text-white font-medium text-lg">Currently Unavailable</span>
@@ -154,7 +154,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
         <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
       </svg>
       <span className="font-medium text-gray-900">{product.rating}</span>
-      <span className="text-gray-400 ml-1">({product.reviewCount})</span>
+      <span className="text-gray-400 ml-1">({product.reviewCount || 0})</span>
     </div>
   );
 
@@ -165,22 +165,22 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative w-full h-44 xs:h-48 sm:h-52 md:h-auto md:w-48 lg:w-56 flex-shrink-0">
+      {/* <div className="relative w-full h-44 xs:h-48 sm:h-52 md:h-auto md:w-48 lg:w-56 flex-shrink-0">
         <img
-          src={product.image}
-          alt={product.name}
+          src={Array.isArray(product.image) ? product.image[0] : product.image || '/placeholder-image.jpg'}
+          alt={product.name || product.itemName}
           className="w-full h-full object-cover transition-transform duration-500"
           style={{ transform: isHovered ? 'scale(1.05)' : 'scale(1)' }}
           loading="lazy"
         />
         {renderBadges()}
         {renderOverlay()}
-      </div>
+      </div> */}
 
       <div className="p-3 sm:p-4 md:p-5 lg:p-6 flex-1 flex flex-col gap-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <div className="flex-1 min-w-0">
-            <h3 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight line-clamp-2">{product.name}</h3>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-900 leading-tight line-clamp-2">{product.name || product.itemName}</h3>
             <p className="text-sm sm:text-base text-gray-600 line-clamp-3 sm:line-clamp-2">{product.description}</p>
           </div>
           <div className="text-left sm:text-right flex-shrink-0">
@@ -233,8 +233,8 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
     >
       <div className="relative overflow-hidden pt-[68%] xs:pt-[72%] sm:pt-[75%] md:pt-[70%] lg:pt-[68%]">
         <img
-          src={product.image}
-          alt={product.name}
+          src={Array.isArray(product.image) ? product.image[0] : product.image || '/placeholder-image.jpg'}
+          alt={product.name || product.itemName}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500"
           style={{ transform: isHovered ? 'scale(1.05)' : 'scale(1)' }}
           loading="lazy"
@@ -246,7 +246,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
 
       <div className="p-3 sm:p-4 md:p-5 lg:p-6 flex-1 flex flex-col gap-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
-          <h3 className="font-semibold text-gray-900 text-sm sm:text-base md:text-lg line-clamp-2 flex-1 min-w-0">{product.name}</h3>
+          <h3 className="font-semibold text-gray-900 text-sm sm:text-base md:text-lg line-clamp-2 flex-1 min-w-0">{product.name || product.itemName}</h3>
           <div className="flex-shrink-0 text-left sm:text-right">
             <div className="font-bold text-sm sm:text-base md:text-lg text-gray-900">{formatPrice(product.price)}</div>
             {product.originalPrice && (

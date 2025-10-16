@@ -27,12 +27,16 @@ const DigitalMenu = () => {
     tableError,
     restaurantLoading,
     tableLoading,
+    restaurantMenuItemsResponse,
+    restaurantMenuItemsError,
+    restaurantMenuItemsLoading,
   } = useRestaurantData();
   const { addToCart } = useCart();
   const { addToast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedProduct, setSelectedProduct] = useState(null)
+  const [menuItemsData, setMenuItemsData] = useState(menuData.menuItems)
   const [filteredItems, setFilteredItems] = useState(menuData.menuItems)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showTableBanner, setShowTableBanner] = useState(true)
@@ -107,10 +111,10 @@ const DigitalMenu = () => {
   }, [tableError]);
 
   const heroStats = useMemo(() => {
-    const totalItems = menuData.menuItems.length;
+    const totalItems = menuItemsData.length;
     const categories = `${menuData.categories.length}+`;
     const averageRating = (
-      menuData.menuItems.reduce((acc, item) => acc + (item.rating || 0), 0) /
+      menuItemsData.reduce((acc, item) => acc + (item.rating || 0), 0) /
       (totalItems || 1)
     ).toFixed(1);
 
@@ -119,42 +123,69 @@ const DigitalMenu = () => {
       categories,
       averageRating,
     };
-  }, []);
+  }, [menuItemsData]);
 
   const showcaseItems = useMemo(() => {
-    const shuffled = [...menuData.menuItems]
+    const shuffled = [...menuItemsData]
       .sort(() => Math.random() - 0.5)
       .slice(0, 8);
     return shuffled.map((item) => ({
       ...item,
       tag: item.isBestseller ? 'Best Seller' : item.isVeg ? 'Veg' : 'Popular',
     }));
-  }, []);
+  }, [menuItemsData]);
+
+  useEffect(() => {
+    if (restaurantMenuItemsResponse?.data?.items && restaurantMenuItemsResponse.data.items.length > 0) {
+      setMenuItemsData(restaurantMenuItemsResponse.data.items);
+    } else if (!restaurantMenuItemsLoading && restaurantId) {
+      // If loading is complete but no data, fall back to dummy data
+      setMenuItemsData(menuData.menuItems);
+    } else {
+      // Default to dummy data for preview mode
+      setMenuItemsData(menuData.menuItems);
+    }
+  }, [restaurantMenuItemsResponse, restaurantMenuItemsLoading, restaurantId]);
 
   // Filter menu items based on category and search
   useEffect(() => {
-    let items = menuData.menuItems
+    let items = menuItemsData;
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      const categoryId = menuData.categories.find(cat =>
-        cat.name.toLowerCase() === selectedCategory.toLowerCase()
-      )?.id
-      items = items.filter(item => item.categoryId === categoryId)
+      // For API data, category is productCategory, for dummy data it's categoryId
+      if (items.length > 0 && items[0].productCategory) {
+        // API data structure
+        const categoryId = menuData.categories.find(cat =>
+          cat.name.toLowerCase() === selectedCategory.toLowerCase()
+        )?.id;
+        items = items.filter(item => item.productCategory === categoryId);
+      } else {
+        // Dummy data structure
+        const categoryId = menuData.categories.find(cat =>
+          cat.name.toLowerCase() === selectedCategory.toLowerCase()
+        )?.id;
+        items = items.filter(item => item.categoryId === categoryId);
+      }
     }
 
     // Filter by search query
     if (searchQuery.trim()) {
-      items = items.filter(item =>
-        item.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
-        item.ingredients.some(ingredient => ingredient.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
+      items = items.filter(item => {
+        const name = item.itemName || item.name || '';
+        const description = item.description || '';
+        const tags = item.tags || [];
+        const ingredients = item.ingredients || [];
+
+        return name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+               description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+               tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
+               ingredients.some(ingredient => ingredient.toLowerCase().includes(searchQuery.toLowerCase()));
+      });
     }
 
-    setFilteredItems(items)
-  }, [selectedCategory, searchQuery])
+    setFilteredItems(items);
+  }, [selectedCategory, searchQuery, menuItemsData]);
 
   const handleProductClick = (product) => {
     setSelectedProduct(product)
@@ -173,8 +204,8 @@ const DigitalMenu = () => {
   const handleShowcaseAdd = (item) => {
     if (!item) return;
     addToCart({
-      id: item.id,
-      name: item.name,
+      id: item.id || item._id,
+      name: item.name || item.itemName,
       price: item.price,
       image: item.image,
       category: item.category,
@@ -186,7 +217,7 @@ const DigitalMenu = () => {
     addToast({
       type: 'success',
       title: 'Added to cart',
-      message: `${item.name} is ready in your cart.`,
+      message: `${item.name || item.itemName} is ready in your cart.`,
       position: 'bottom-right',
     });
   };
