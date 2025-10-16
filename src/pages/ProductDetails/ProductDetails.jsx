@@ -4,6 +4,7 @@ import { useRestaurantData } from '../../context/RestaurantDataContext.jsx';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext.jsx';
 import { menuData } from '../../data/menuData.js';
+import { TiArrowBackOutline } from 'react-icons/ti';
 
 const ProductDetails = () => {
   const { productId } = useParams();
@@ -120,16 +121,14 @@ const ProductDetails = () => {
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-slate-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
         {/* Back Button */}
+        <div className="flex items-center justify-between mb-2 py-2 px-1 rounded-sm bg-gradient-to-br from-slate-100 to-slate-100">
         <button
           onClick={() => navigate(-1)}
-          className="inline-flex items-center text-slate-600 hover:text-slate-800 mb-8 transition-all duration-200 hover:translate-x-1"
+          className="text-slate-600 hover:text-slate-800 transition-all duration-200 hover:translate-x-2 border border-black/20 rounded-full px-4 py-1"
         >
-          <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-          </svg>
-          <span className="font-medium">Back to Menu</span>
+          <span className="font-medium flex items-center gap-2"><TiArrowBackOutline className='text-2xl'/><span>Back to Menu</span></span>
         </button>
-
+        </div>
         <div className="bg-white rounded-3xl shadow-lg border border-slate-200/60 overflow-hidden backdrop-blur-sm">
           <div className="grid lg:grid-cols-2 gap-0">
             {/* Product Gallery - Modern Layout */}
