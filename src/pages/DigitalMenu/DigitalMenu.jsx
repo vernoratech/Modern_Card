@@ -178,9 +178,9 @@ const DigitalMenu = () => {
         const ingredients = item.ingredients || [];
 
         return name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-               description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-               tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
-               ingredients.some(ingredient => ingredient.toLowerCase().includes(searchQuery.toLowerCase()));
+          description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())) ||
+          ingredients.some(ingredient => ingredient.toLowerCase().includes(searchQuery.toLowerCase()));
       });
     }
 
@@ -258,145 +258,169 @@ const DigitalMenu = () => {
   return (
     <div className="digital-menu">
       {isLoadingIdentifiers ? (
-        <div className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-slate-900 via-slate-900/95 to-slate-900 text-white">
-          <div className="flex flex-col items-center gap-6 rounded-3xl border border-white/10 bg-white/5 px-10 py-12 text-center shadow-[0_24px_50px_rgba(15,23,42,0.4)] backdrop-blur">
-            <span className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-4 py-1 text-[11px] font-semibold uppercase tracking-[0.35em] text-white/70">
-              Fetching menu
+        <div class="flex min-h-screen flex-col items-center justify-center bg-gradient-to-br from-zinc-950 via-zinc-900 to-zinc-950 text-white antialiased">
+          <div class="group relative flex flex-col items-center gap-9 rounded-[2.5rem] border border-zinc-800/50 bg-zinc-900/40 px-16 py-20 text-center shadow-2xl backdrop-blur-3xl transition-all duration-700 hover:border-zinc-700/50 hover:shadow-[0_0_60px_-15px_rgba(255,255,255,0.1)]">
+
+
+            <span class="inline-flex items-center gap-2 rounded-full border border-zinc-700/50 bg-zinc-800/50 px-5 py-2 text-[10px] font-bold tracking-[0.3em] text-zinc-400 uppercase backdrop-blur-sm transition-all duration-500 group-hover:border-zinc-600 group-hover:bg-zinc-700/50">
+              <span class="relative flex h-2 w-2">
+                <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-emerald-400 opacity-75"></span>
+                <span class="relative inline-flex h-2 w-2 rounded-full bg-emerald-500"></span>
+              </span>
+              Preparing
             </span>
-            <h1 className="text-2xl font-bold sm:text-3xl">Setting your table</h1>
-            <p className="max-w-md text-sm text-white/70 sm:text-base">
-              We're getting your personalized dining experience ready. Hold tight while we fetch the latest menu and table details.
-            </p>
-            <div className="relative h-16 w-16">
-              <div className="absolute inset-0 animate-ping rounded-full border-4 border-white/20"></div>
-              <div className="absolute inset-3 rounded-full border-4 border-white/40"></div>
+
+
+            <h1 class="text-4xl font-black sm:text-5xl tracking-tight text-transparent bg-clip-text bg-gradient-to-b from-white to-zinc-400">
+              Setting your table
+            </h1>
+
+
+            <div class="flex flex-col gap-2 max-w-md text-sm text-zinc-400 sm:text-base">
+              <p class="transition-all duration-500 group-hover:text-zinc-300">
+                We're getting your personalized dining experience ready.
+              </p>
+              <p class="text-zinc-500 transition-all duration-500 delay-75 group-hover:text-zinc-400">
+                Hold tight while we fetch the latest menu and table details.
+              </p>
             </div>
+
+
+            <div class="relative h-16 w-16 mt-2">
+              <div class="absolute inset-0 rounded-full border-[3px] border-zinc-800"></div>
+              <div class="absolute inset-0 rounded-full border-[3px] border-transparent border-t-white border-r-white/60 animate-spin"></div>
+              <div class="absolute inset-3 rounded-full bg-zinc-800/50 backdrop-blur-sm"></div>
+            </div>
+
+
+            <span class="text-xs text-zinc-600 font-medium tracking-wide">This will only take a moment</span>
           </div>
         </div>
+
       ) : (
         <div className="menu-container max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
-        <MenuNavbar restaurant={menuData.restaurant} restaurantResponse={restaurantResponse} />
+          <MenuNavbar restaurant={menuData.restaurant} restaurantResponse={restaurantResponse} />
 
-        {tableData && showTableBanner && (
-          <div className="fixed bottom-4 right-4 z-40 w-[85vw] max-w-xs sm:max-w-sm pointer-events-none sm:bottom-6 sm:right-6">
-            <section className="pointer-events-auto relative overflow-hidden rounded-2xl border border-slate-900/30 bg-slate-900/90 text-white shadow-2xl backdrop-blur">
-              <button
-                type="button"
-                onClick={() => setShowTableBanner(false)}
-                className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/15 text-xs font-semibold text-white transition hover:bg-white/30 cursor-pointer"
-                aria-label="Dismiss table details"
-              >
-                ✕
-              </button>
-              <div className="space-y-3 p-4">
-                <div className="space-y-1">
-                  <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em]">
-                    <span>Table #{tableData.tableNumber}</span>
-                    <span className="text-[10px] font-medium normal-case tracking-normal text-white/70">{tableData.location}</span>
-                  </div>
-                  <h3 className="text-base font-semibold sm:text-lg">Reserved table details</h3>
-                  <p className="text-xs text-white/80 sm:text-sm">
-                    Seating capacity for {tableData.capacity} guests · Status{' '}
-                    <span className="font-semibold capitalize text-white">{tableData.status}</span>
-                  </p>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="rounded-xl border border-white/10 bg-white/10 p-2 text-center">
-                    <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Capacity</p>
-                    <p className="text-lg font-semibold">{tableData.capacity}</p>
-                  </div>
-                  <div className="rounded-xl border border-${tableData.status === 'available' ? 'emerald' : 'amber'}-400/30 bg-white/10 p-2 text-center">
-                    <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Status</p>
-                    <p className={`text-base font-semibold capitalize ${tableStatusColor}`}>{tableData.status}</p>
-                  </div>
-                  <div className="rounded-xl border border-white/10 bg-white/10 p-2 text-center">
-                    <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Reserved</p>
-                    <p className={`text-base font-semibold ${reservationColor}`}>{tableData.reservedStatus ? 'Yes' : 'No'}</p>
-                  </div>
-                </div>
+          {tableData && showTableBanner && (
+            <div className="fixed bottom-4 right-4 z-40 w-[85vw] max-w-xs sm:max-w-sm pointer-events-none sm:bottom-6 sm:right-6">
+              <section className="pointer-events-auto relative overflow-hidden rounded-2xl border border-slate-900/30 bg-slate-900/90 text-white shadow-2xl backdrop-blur">
                 <button
                   type="button"
-                  onClick={() => document.getElementById('menu-grid')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow-sm transition hover:from-sky-400 hover:to-indigo-400 cursor-pointer"
+                  onClick={() => setShowTableBanner(false)}
+                  className="absolute right-2 top-2 inline-flex h-7 w-7 items-center justify-center rounded-full border border-white/20 bg-white/15 text-xs font-semibold text-white transition hover:bg-white/30 cursor-pointer"
+                  aria-label="Dismiss table details"
                 >
-                  Book this table
+                  ✕
                 </button>
-              </div>
-            </section>
+                <div className="space-y-3 p-4">
+                  <div className="space-y-1">
+                    <div className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/15 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.35em]">
+                      <span>Table #{tableData.tableNumber}</span>
+                      <span className="text-[10px] font-medium normal-case tracking-normal text-white/70">{tableData.location}</span>
+                    </div>
+                    <h3 className="text-base font-semibold sm:text-lg">Reserved table details</h3>
+                    <p className="text-xs text-white/80 sm:text-sm">
+                      Seating capacity for {tableData.capacity} guests · Status{' '}
+                      <span className="font-semibold capitalize text-white">{tableData.status}</span>
+                    </p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="rounded-xl border border-white/10 bg-white/10 p-2 text-center">
+                      <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Capacity</p>
+                      <p className="text-lg font-semibold">{tableData.capacity}</p>
+                    </div>
+                    <div className="rounded-xl border border-${tableData.status === 'available' ? 'emerald' : 'amber'}-400/30 bg-white/10 p-2 text-center">
+                      <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Status</p>
+                      <p className={`text-base font-semibold capitalize ${tableStatusColor}`}>{tableData.status}</p>
+                    </div>
+                    <div className="rounded-xl border border-white/10 bg-white/10 p-2 text-center">
+                      <p className="text-[10px] uppercase tracking-[0.35em] text-white/60">Reserved</p>
+                      <p className={`text-base font-semibold ${reservationColor}`}>{tableData.reservedStatus ? 'Yes' : 'No'}</p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('menu-grid')?.scrollIntoView({ behavior: 'smooth' })}
+                    className="mt-1 inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-sky-500 to-indigo-500 px-3 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white shadow-sm transition hover:from-sky-400 hover:to-indigo-400 cursor-pointer"
+                  >
+                    Book this table
+                  </button>
+                </div>
+              </section>
+            </div>
+          )}
+
+          {tableData && !showTableBanner && (
+            <button
+              type="button"
+              onClick={() => setShowTableBanner(true)}
+              className="fixed bottom-4 right-4 z-30 inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-900/20 bg-sky-500 text-white shadow-xl transition hover:bg-sky-400 sm:bottom-6 sm:right-6 cursor-pointer"
+              aria-label="Show table details"
+            >
+              <MdOutlineTableBar />
+            </button>
+          )}
+
+          <MenuHeader restaurant={menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse} />
+
+          <MenuFilters
+            categories={menuData.categories}
+            selectedCategory={selectedCategory}
+            onCategoryChange={handleCategoryChange}
+            searchQuery={searchQuery}
+            onSearchChange={setSearchQuery}
+            totalItems={filteredItems.length}
+          />
+
+
+
+          <div key={selectedCategory}>
+            <MenuGrid
+              items={filteredItems}
+              onProductClick={handleProductClick}
+            />
           </div>
-        )}
 
-        {tableData && !showTableBanner && (
-          <button
-            type="button"
-            onClick={() => setShowTableBanner(true)}
-            className="fixed bottom-4 right-4 z-30 inline-flex h-12 w-12 items-center justify-center rounded-full border border-slate-900/20 bg-sky-500 text-white shadow-xl transition hover:bg-sky-400 sm:bottom-6 sm:right-6 cursor-pointer"
-            aria-label="Show table details"
-          >
-            <MdOutlineTableBar />
-          </button>
-        )}
+          {isModalOpen && selectedProduct && (
+            <ProductModal
+              product={selectedProduct}
+              onClose={closeModal}
+              restaurant={menuData.restaurant}
+            />
+          )}
 
-        <MenuHeader restaurant={menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse} />
-
-        <MenuFilters
-          categories={menuData.categories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={handleCategoryChange}
-          searchQuery={searchQuery}
-          onSearchChange={setSearchQuery}
-          totalItems={filteredItems.length}
-        />
-
-
-
-        <div key={selectedCategory}>
-          <MenuGrid
-            items={filteredItems}
-            onProductClick={handleProductClick}
+          <MenuHorizontalShowcase
+            title="Explore quick picks"
+            subtitle="A few popular bites you might enjoy"
+            items={showcaseItems}
+            onItemClick={handleProductClick}
+            onAdd={handleShowcaseAdd}
+            viewAllCategory="all"
           />
-        </div>
-
-        {isModalOpen && selectedProduct && (
-          <ProductModal
-            product={selectedProduct}
-            onClose={closeModal}
-            restaurant={menuData.restaurant}
+          <MenuHorizontalShowcase
+            title="Fresh off the grill"
+            subtitle="Hot picks sizzling straight from our kitchen"
+            items={showcaseItems}
+            onItemClick={handleProductClick}
+            onAdd={handleShowcaseAdd}
+            viewAllCategory="main course"
           />
-        )}
-
-        <MenuHorizontalShowcase
-          title="Explore quick picks"
-          subtitle="A few popular bites you might enjoy"
-          items={showcaseItems}
-          onItemClick={handleProductClick}
-          onAdd={handleShowcaseAdd}
-          viewAllCategory="all"
-        />
-        <MenuHorizontalShowcase
-          title="Fresh off the grill"
-          subtitle="Hot picks sizzling straight from our kitchen"
-          items={showcaseItems}
-          onItemClick={handleProductClick}
-          onAdd={handleShowcaseAdd}
-          viewAllCategory="main course"
-        />
-        <MenuHorizontalShowcase
-          title="Chef's cravings"
-          subtitle="Specially curated plates for your appetite"
-          items={showcaseItems}
-          onItemClick={handleProductClick}
-          onAdd={handleShowcaseAdd}
-          viewAllCategory="starters"
-        />
-        <MenuHorizontalShowcase
-          title="Sweet tooth alerts"
-          subtitle="Dessert delights to wrap things up"
-          items={showcaseItems}
-          onItemClick={handleProductClick}
-          onAdd={handleShowcaseAdd}
-          viewAllCategory="desserts"
-        />
+          <MenuHorizontalShowcase
+            title="Chef's cravings"
+            subtitle="Specially curated plates for your appetite"
+            items={showcaseItems}
+            onItemClick={handleProductClick}
+            onAdd={handleShowcaseAdd}
+            viewAllCategory="starters"
+          />
+          <MenuHorizontalShowcase
+            title="Sweet tooth alerts"
+            subtitle="Dessert delights to wrap things up"
+            items={showcaseItems}
+            onItemClick={handleProductClick}
+            onAdd={handleShowcaseAdd}
+            viewAllCategory="desserts"
+          />
         </div>
       )}
     </div>
