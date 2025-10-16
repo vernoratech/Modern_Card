@@ -48,7 +48,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
       id: product.id || product._id,
       name: product.name || product.itemName,
       price: product.price,
-      image: product.image,
+      image: product.image?.[0] || '/placeholder-image.jpg',
       category: product.category,
       isVeg: product.isVeg,
       isVegan: product.isVegan,
@@ -65,7 +65,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
 
   const handleViewDetails = (e) => {
     e.stopPropagation();
-    navigate(`/product/${product.id}`);
+    navigate(`/product/${product.id || product._id}`);
   };
 
   const renderActions = () => (
@@ -97,7 +97,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
     if (onProductClick) {
       onProductClick(product);
     } else {
-      navigate(`/product/${product.id}`);
+      navigate(`/product/${product.id || product._id}`);
     }
   };
 
@@ -139,7 +139,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
   };
 
   const renderOverlay = () => {
-    if (!product.isAvailable) {
+    if (product.isAvailable === false || product.isActive === 0) {
       return (
         <div className="absolute inset-0 bg-black bg-opacity-60 flex items-center justify-center rounded-xl">
           <span className="text-white font-medium text-lg">Currently Unavailable</span>
@@ -165,9 +165,9 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <div className="relative w-full h-44 xs:h-48 sm:h-52 md:h-auto md:w-48 lg:w-56 flex-shrink-0">
+      {/* <div className="relative w-full h-44 xs:h-48 sm:h-52 md:h-auto md:w-48 lg:w-56 flex-shrink-0">
         <img
-          src={product.image}
+          src={Array.isArray(product.image) ? product.image[0] : product.image || '/placeholder-image.jpg'}
           alt={product.name || product.itemName}
           className="w-full h-full object-cover transition-transform duration-500"
           style={{ transform: isHovered ? 'scale(1.05)' : 'scale(1)' }}
@@ -175,7 +175,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
         />
         {renderBadges()}
         {renderOverlay()}
-      </div>
+      </div> */}
 
       <div className="p-3 sm:p-4 md:p-5 lg:p-6 flex-1 flex flex-col gap-3">
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
@@ -233,7 +233,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
     >
       <div className="relative overflow-hidden pt-[68%] xs:pt-[72%] sm:pt-[75%] md:pt-[70%] lg:pt-[68%]">
         <img
-          src={product.image}
+          src={Array.isArray(product.image) ? product.image[0] : product.image || '/placeholder-image.jpg'}
           alt={product.name || product.itemName}
           className="absolute inset-0 w-full h-full object-cover transition-transform duration-500"
           style={{ transform: isHovered ? 'scale(1.05)' : 'scale(1)' }}

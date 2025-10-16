@@ -42,7 +42,7 @@ const MenuGrid = ({ items, onProductClick }) => {
       >
         {items.map((item) => (
           <div
-            key={item.id}
+            key={item.id || item._id}
             className="snap-start flex-shrink-0 w-[14.5rem] sm:w-[17rem] md:w-[18.5rem] lg:w-[20rem] transition-transform duration-300 hover:-translate-y-1 hover:shadow-2xl"
           >
             <ProductCard
