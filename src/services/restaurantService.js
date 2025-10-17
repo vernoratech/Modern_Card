@@ -1,6 +1,6 @@
 // src/services/restaurantService.js
-export const API_BASE_URL = 'https://restaurantmenu-five.vercel.app/api';
-// export const API_BASE_URL = 'http://localhost:5000/api';
+// export const API_BASE_URL = 'https://restaurantmenu-five.vercel.app/api';
+export const API_BASE_URL = 'http://localhost:5000/api';
 
 export const fetchRestaurantMenuById = async (restaurantId) => {
   if (!restaurantId) {
@@ -33,6 +33,23 @@ export const fetchRestaurantMenuItems = async (restaurantId) => {
 
   return response.json();
 };
+
+export const fetchCategories = async (restaurantId) => {
+  if (!restaurantId) {
+    throw new Error('restaurantId is required to fetch categories');
+  }
+
+  const endpoint = `${API_BASE_URL}/restaurants/category/menu-get-category/${restaurantId}/categories`;
+  const response = await fetch(endpoint);
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Failed to fetch categories: ${response.status} ${errorText}`);
+  }
+
+  return response.json();
+};
+
 
 export const fetchTableDetails = async (restaurantId, tableId) => {
   if (!restaurantId || !tableId) {

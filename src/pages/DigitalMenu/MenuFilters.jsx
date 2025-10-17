@@ -11,6 +11,7 @@ const MenuFilters = ({
   onSearchChange,
   totalItems
 }) => {
+  // Use categories prop (dynamic or static based on what's passed)
   const safeCategories = Array.isArray(categories) ? categories.filter(Boolean) : [];
   const selectedCategoryValue = (selectedCategory ?? 'all').toLowerCase();
 
@@ -108,9 +109,10 @@ const MenuFilters = ({
             {safeCategories.map((category) => {
               const categoryName = category?.name ?? '';
               const active = categoryName && selectedCategoryValue === categoryName.toLowerCase();
+              const categoryId = category?._id || category?.id; // Handle both API and static formats
               return (
                 <button
-                  key={category.id}
+                  key={categoryId}
                   className={`group relative flex shrink-0 snap-start items-center gap-2 sm:gap-3 rounded-2xl border px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${active
                       ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
                       : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'

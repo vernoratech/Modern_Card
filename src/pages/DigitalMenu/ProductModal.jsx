@@ -9,7 +9,12 @@ const ProductModal = ({ product, onClose, restaurant }) => {
 
   const getDietaryBadges = () => {
     const badges = []
-    if (product.isVeg) badges.push({ icon: '🟢', text: 'Vegetarian', color: 'green' })
+    // Check itemCategory field (from API) first, then fall back to boolean fields
+    if (product.itemCategory === 'veg' || product.isVeg) {
+      badges.push({ icon: '🟢', text: 'Vegetarian', color: 'green' })
+    } else if (product.itemCategory === 'non-veg') {
+      badges.push({ icon: '🔴', text: 'Non-Vegetarian', color: 'red' })
+    }
     if (product.isVegan) badges.push({ icon: '🌱', text: 'Vegan', color: 'green' })
     if (product.isGlutenFree) badges.push({ icon: '🚫🌾', text: 'Gluten Free', color: 'blue' })
     return badges
@@ -20,7 +25,8 @@ const ProductModal = ({ product, onClose, restaurant }) => {
   }
 
   const getTotalPrice = () => {
-    return product.price * quantity
+    const price = product.discountPrice || product.price || 0
+    return price * quantity
   }
 
   const handleQuantityChange = (delta) => {
@@ -61,7 +67,7 @@ const ProductModal = ({ product, onClose, restaurant }) => {
         <div className="modal-content">
           {/* Product Image */}
           <div className="modal-image relative h-48 sm:h-56 md:h-64 lg:h-80 overflow-hidden rounded-t-xl sm:rounded-t-2xl">
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            <img src={Array.isArray(product.image) ? product.image[0] : product.image || '/placeholder-image.jpg'} alt={product.name || product.itemName} className="w-full h-full object-cover" />
             <div className="image-badges absolute top-3 left-3 sm:top-4 sm:left-4 flex flex-col gap-2">
               {product.isBestseller && (
                 <span className="badge bestseller bg-yellow-500 text-white text-xs px-2 py-1 rounded-full font-medium">🏆 Bestseller</span>
@@ -80,7 +86,7 @@ const ProductModal = ({ product, onClose, restaurant }) => {
               <div className="flex-1">
                 <h2 className="product-name text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{product.name || product.itemName}</h2>
                 <div className="price-section text-lg sm:text-xl font-semibold text-green-600">
-                  {product.currency || '₹'}{product.price}
+                  {product.currency || '₹'}{(product.discountPrice || product.price)}
                   {product.originalPrice && (
                     <span className="original-price ml-3 text-sm text-gray-400 line-through">{product.currency || '₹'}{product.originalPrice}</span>
                   )}

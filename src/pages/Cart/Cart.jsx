@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useCart } from '../../context/CartContext';
 import './Cart.css';
@@ -6,6 +6,11 @@ import { TiArrowBackOutline } from 'react-icons/ti';
 
 const Cart = () => {
   const { items, total, itemCount, removeFromCart, updateQuantity, clearCart } = useCart();
+
+  // Scroll to top when component mounts
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
 
   const formatPrice = (price) => {
     return new Intl.NumberFormat('en-US', {
@@ -24,7 +29,7 @@ const Cart = () => {
         <div className="cart-container">
           <div className="cart-nav">
             <Link to="/" className="cart-back-btn">
-<span className="font-medium flex items-center gap-2"><TiArrowBackOutline className='text-2xl' /><span>Back to Menu</span></span>
+              <span className="font-medium flex items-center gap-2"><TiArrowBackOutline className='text-2xl' /><span>Back to Menu</span></span>
             </Link>
           </div>
           <div className="cart-header">

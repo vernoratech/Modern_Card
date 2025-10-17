@@ -12,10 +12,19 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
 
   const getDietaryBadges = () => {
     const badges = [];
-    if (product.isVeg) badges.push({ icon: '🌱', text: 'Veg', color: 'bg-green-100 text-green-800' });
+
+    // Check itemCategory field (from API) first, then fall back to boolean fields
+    if (product.itemCategory === 'veg' || product.isVeg) {
+      badges.push({ icon: '🌱', text: 'Veg', color: 'bg-green-100 text-green-800' });
+    } else if (product.itemCategory === 'non-veg') {
+      badges.push({ icon: '🍗', text: 'Non-Veg', color: 'bg-red-100 text-red-800' });
+    }
+
+    // Keep existing badges for vegan and gluten-free
     if (product.isVegan) badges.push({ icon: '🌿', text: 'Vegan', color: 'bg-teal-100 text-teal-800' });
     if (product.isGlutenFree) badges.push({ icon: '🌾', text: 'GF', color: 'bg-amber-100 text-amber-800' });
     if (product.isBestseller) badges.push({ icon: '⭐', text: 'Bestseller', color: 'bg-yellow-100 text-yellow-800' });
+
     return badges;
   };
 
@@ -248,7 +257,7 @@ const ProductCard = ({ product, viewMode = 'grid', onProductClick }) => {
         <div className="flex flex-col gap-2 sm:flex-row sm:items-start sm:justify-between sm:gap-3">
           <h3 className="font-semibold text-gray-900 text-sm sm:text-base md:text-lg line-clamp-2 flex-1 min-w-0">{product.name || product.itemName}</h3>
           <div className="flex-shrink-0 text-left sm:text-right">
-            <div className="font-bold text-sm sm:text-base md:text-lg text-gray-900">{formatPrice(product.price)}</div>
+            <div className="font-bold text-sm sm:text-base md:text-lg text-gray-900">{formatPrice(product.discountPrice)}</div>
             {product.originalPrice && (
               <div className="text-xs sm:text-sm text-gray-400 line-through">
                 {formatPrice(product.originalPrice)}

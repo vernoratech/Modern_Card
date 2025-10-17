@@ -26,6 +26,43 @@ const MenuHorizontalShowcase = ({
     navigate(`/menu${search ? `?${search}` : ''}`);
   };
 
+  const getDietaryBadges = (item) => {
+    const badges = [];
+
+    // Check itemCategory field (from API) first, then fall back to boolean fields
+    if (item.itemCategory === 'veg' || item.isVeg) {
+      badges.push({ icon: '🟢', text: 'Veg', color: 'bg-green-100 text-green-800' });
+    } else if (item.itemCategory === 'non-veg') {
+      badges.push({ icon: '🔴', text: 'Non-Veg', color: 'bg-red-100 text-red-800' });
+    }
+
+    // Keep existing badges for vegan and gluten-free
+    if (item.isVegan) badges.push({ icon: '🌿', text: 'Vegan', color: 'bg-teal-100 text-teal-800' });
+    if (item.isGlutenFree) badges.push({ icon: '🌾', text: 'GF', color: 'bg-amber-100 text-amber-800' });
+    if (item.isBestseller) badges.push({ icon: '⭐', text: 'Bestseller', color: 'bg-yellow-100 text-yellow-800' });
+
+    return badges;
+  };
+
+  const renderDietaryBadges = (item) => {
+    const badges = getDietaryBadges(item);
+    if (!badges.length) return null;
+
+    return (
+      <div className="absolute top-2 left-2 flex flex-col gap-1">
+        {badges.map((badge, index) => (
+          <span
+            key={`${badge.text}-${index}`}
+            className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium ${badge.color}`}
+          >
+            <span>{badge.icon}</span>
+            <span>{badge.text}</span>
+          </span>
+        ))}
+      </div>
+    );
+  };
+
   return (
     <section data-showcase className="mt-10 sm:mt-12">
       <div className="flex items-center justify-between gap-3">
@@ -58,6 +95,7 @@ const MenuHorizontalShowcase = ({
                 onClick={() => onItemClick?.(item)}
               >
                 <img src={Array.isArray(item.image) ? item.image[0] : item.image || '/placeholder-image.jpg'} alt={item.name || item.itemName} loading="lazy" className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105" />
+                {renderDietaryBadges(item)}
                 <span className="absolute right-2 top-2 rounded-full bg-white/90 px-2 py-0.5 text-[11px] font-semibold text-slate-700 shadow-sm">
                   {item.tag ?? 'Chef pick'}
                 </span>
@@ -66,7 +104,7 @@ const MenuHorizontalShowcase = ({
                 <h3 className="line-clamp-2 text-sm font-semibold text-slate-900">{item.name || item.itemName}</h3>
                 <p className="text-xs text-slate-500 line-clamp-2">{item.description}</p>
                 <div className="flex items-center justify-between">
-                  <span className="text-sm font-bold text-slate-900">{item.currency || '₹'}{item.price}</span>
+                  <span className="text-sm font-bold text-slate-900">{item.currency || '₹'}{item.discountPrice}</span>
                   <span className="text-[11px] text-emerald-500 font-semibold">★ {item.rating ?? '4.7'}</span>
                 </div>
                 <div className="mt-2 flex items-center gap-2">

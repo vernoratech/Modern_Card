@@ -26,8 +26,8 @@ const ProductDetails = () => {
       try {
         // Use API response data if available
         let menuItems = [];
-        if (restaurantMenuItemsResponse?.data?.items && restaurantMenuItemsResponse.data.items.length > 0) {
-          menuItems = restaurantMenuItemsResponse.data.items;
+        if (restaurantMenuItemsResponse?.data && Array.isArray(restaurantMenuItemsResponse.data) && restaurantMenuItemsResponse.data.length > 0) {
+          menuItems = restaurantMenuItemsResponse.data;
         } else {
           // Fall back to static data for Preview Mode
           menuItems = menuData.menuItems;
@@ -68,13 +68,14 @@ const ProductDetails = () => {
   };
 
   const handleAddToCart = () => {
+    const price = product.discountPrice || product.price || 0;
     addToCart({
       id: product.id || product._id,
       name: product.name || product.itemName,
-      price: product.price,
-      image: product.image?.[0] || '/placeholder-image.jpg',
+      price: price,
+      image: Array.isArray(product.image) ? product.image[0] : product.image || '/placeholder-image.jpg',
       category: product.category,
-      isVeg: product.isVeg,
+      isVeg: product.itemCategory === 'veg' || product.isVeg,
       isVegan: product.isVegan,
       isGlutenFree: product.isGlutenFree,
       quantity: quantity,
@@ -224,11 +225,15 @@ const ProductDetails = () => {
                     <h1 className="text-3xl lg:text-4xl font-bold text-slate-900 leading-tight">
                       {product.name || product.itemName}
                     </h1>
-                    {product.isVeg && (
+                    {product.itemCategory === 'veg' || product.isVeg ? (
                       <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 border border-green-200">
                         🥬 Vegetarian
                       </span>
-                    )}
+                    ) : product.itemCategory === 'non-veg' ? (
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 border border-red-200">
+                        🍗 Non-Vegetarian
+                      </span>
+                    ) : null}
                   </div>
 
                   <p className="text-lg text-slate-600 leading-relaxed">
@@ -289,14 +294,14 @@ const ProductDetails = () => {
                 <div className="bg-slate-50 rounded-2xl p-6 border border-slate-200">
                   <div className="flex items-baseline gap-4">
                     <span className="text-4xl font-bold text-slate-900">
-                      {formatPrice(product.price)}
+                      {formatPrice(product.discountPrice || product.price)}
                     </span>
-                    {product.originalPrice && product.originalPrice > product.price && (
+                    {product.originalPrice && product.originalPrice > (product.discountPrice || product.price) && (
                       <span className="text-xl text-slate-500 line-through">
                         {formatPrice(product.originalPrice)}
                       </span>
                     )}
-                    {product.discountPrice && (
+                    {product.discountPrice && product.originalPrice && product.originalPrice > product.discountPrice && (
                       <span className="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">
                         Save {formatPrice(product.originalPrice - product.discountPrice)}
                       </span>
@@ -356,7 +361,7 @@ const ProductDetails = () => {
                       <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l-2.5-5M17 19a2 2 0 100 4 2 2 0 000-4zM9 19a2 2 0 100 4 2 2 0 000-4z" />
                       </svg>
-                      <span>Add to Cart • {formatPrice(product.price * quantity)}</span>
+                      <span>Add to Cart • {formatPrice((product.discountPrice || product.price || 0) * quantity)}</span>
                     </button>
 
                     {/* Favorites Button */}
