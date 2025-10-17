@@ -208,13 +208,19 @@ const DigitalMenu = () => {
       isApiMode,
       apiResponse: restaurantMenuItemsResponse,
       isLoading: restaurantMenuItemsLoading,
-      restaurantId
+      restaurantId,
+      currentMenuItemsLength: menuItemsData.length
     });
 
     if (isApiMode) {
       // API mode
-      if (restaurantMenuItemsResponse?.data && Array.isArray(restaurantMenuItemsResponse.data) && restaurantMenuItemsResponse.data.length > 0) {
-        console.log('✅ API Mode: Setting API data', restaurantMenuItemsResponse.data.length, 'items');
+      if (restaurantMenuItemsResponse?.data?.items && Array.isArray(restaurantMenuItemsResponse.data.items) && restaurantMenuItemsResponse.data.items.length > 0) {
+        console.log('✅ API Mode: Setting API data', restaurantMenuItemsResponse.data.items.length, 'items');
+        console.log('Sample API item:', restaurantMenuItemsResponse.data.items[0]);
+        setMenuItemsData(restaurantMenuItemsResponse.data.items);
+      } else if (restaurantMenuItemsResponse?.data && Array.isArray(restaurantMenuItemsResponse.data) && restaurantMenuItemsResponse.data.length > 0) {
+        // Fallback for direct array format
+        console.log('✅ API Mode: Setting API data (direct array)', restaurantMenuItemsResponse.data.length, 'items');
         console.log('Sample API item:', restaurantMenuItemsResponse.data[0]);
         setMenuItemsData(restaurantMenuItemsResponse.data);
       } else if (!restaurantMenuItemsLoading && restaurantId) {
@@ -239,7 +245,8 @@ const DigitalMenu = () => {
 
     return {
       isApiMode,
-      categories: isApiMode && dynamicCategories.length > 0 ? dynamicCategories : menuData.categories,
+      categories: isApiMode && dynamicCategories?.length > 0 ? dynamicCategories : menuData.categories,
+      dynamicCategories: dynamicCategories || [],
       categoriesForStatic: menuData.categoriesApiResponse,
       isLoadingCategories: isApiMode && categoriesLoading
     };
@@ -255,7 +262,9 @@ const DigitalMenu = () => {
       selectedCategory,
       isApiMode,
       categoriesLength: categories?.length || 0,
-      dynamicCategoriesLength: dynamicCategories?.length || 0
+      dynamicCategoriesLength: dynamicCategories?.length || 0,
+      menuItemsDataLength: menuItemsData.length,
+      sampleItem: items[0] ? { id: items[0]._id, name: items[0].itemName, category: items[0].productCategory } : null
     });
 
     // Filter by category
@@ -293,6 +302,8 @@ const DigitalMenu = () => {
         } else {
           console.log('❌ No matching category found for:', selectedCategory);
           console.log('Available categories:', categoriesForStatic?.data?.map(cat => cat.name));
+          // If no matching category found, return all items
+          items = items.filter(item => true);
         }
       } else if (!isApiMode) {
         // Static mode - use static categories for filtering
@@ -301,20 +312,27 @@ const DigitalMenu = () => {
           cat.name.toLowerCase() === selectedCategory.toLowerCase()
         )?._id;
 
-        if (items.length > 0) {
-          // Try different data structures
-          if (items[0].productCategory !== undefined) {
-            console.log('Filtering by productCategory');
-            items = items.filter(item => item.productCategory === categoryId);
-          } else if (items[0].categoryId !== undefined) {
-            console.log('Filtering by categoryId');
-            items = items.filter(item => item.categoryId === categoryId);
-          } else if (items[0].category !== undefined) {
-            console.log('Filtering by category name');
-            items = items.filter(item => item.category?.toLowerCase() === selectedCategory.toLowerCase());
-          } else {
-            console.log('⚠️ Data structure not recognized');
+        if (categoryId) {
+          if (items.length > 0) {
+            // Try different data structures
+            if (items[0].productCategory !== undefined) {
+              console.log('Filtering by productCategory');
+              items = items.filter(item => item.productCategory === categoryId);
+            } else if (items[0].categoryId !== undefined) {
+              console.log('Filtering by categoryId');
+              items = items.filter(item => item.categoryId === categoryId);
+            } else if (items[0].category !== undefined) {
+              console.log('Filtering by category name');
+              items = items.filter(item => item.category?.toLowerCase() === selectedCategory.toLowerCase());
+            } else {
+              console.log('⚠️ Data structure not recognized');
+            }
           }
+        } else {
+          console.log('❌ No matching category found for:', selectedCategory);
+          console.log('Available categories:', menuData.categoriesApiResponse?.data?.map(cat => cat.name));
+          // If no matching category found, return all items
+          items = items.filter(item => true);
         }
       } else {
         console.log('⏳ API mode but categories not loaded yet');
@@ -516,7 +534,7 @@ const DigitalMenu = () => {
           <MenuHeader restaurant={restaurantResponse?.data || menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse} />
 
           <MenuFilters
-            categories={getCurrentMode().categoriesForStatic?.data || getCurrentMode().categories}
+            categories={getCurrentMode().isApiMode ? (getCurrentMode().dynamicCategories?.length > 0 ? getCurrentMode().dynamicCategories : getCurrentMode().categoriesForStatic?.data || []) : getCurrentMode().categories}
             selectedCategory={selectedCategory}
             onCategoryChange={handleCategoryChange}
             searchQuery={searchQuery}

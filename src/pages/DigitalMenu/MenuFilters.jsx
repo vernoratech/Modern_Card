@@ -15,6 +15,20 @@ const MenuFilters = ({
   const safeCategories = Array.isArray(categories) ? categories.filter(Boolean) : [];
   const selectedCategoryValue = (selectedCategory ?? 'all').toLowerCase();
 
+  console.log('MenuFilters Debug:', {
+    categories,
+    safeCategories: safeCategories.length,
+    selectedCategory,
+    selectedCategoryValue,
+    isArray: Array.isArray(categories),
+    sampleCategory: safeCategories[0]
+  });
+
+  // Debug: Check if categories are being passed correctly
+  if (safeCategories.length === 0) {
+    console.log('No categories available for display');
+  }
+
   return (
     <section
       id="menu-filters"
@@ -106,31 +120,40 @@ const MenuFilters = ({
             </button>
 
             {/* Category Buttons - Dynamic Width */}
-            {safeCategories.map((category) => {
-              const categoryName = category?.name ?? '';
-              const active = categoryName && selectedCategoryValue === categoryName.toLowerCase();
-              const categoryId = category?._id || category?.id; // Handle both API and static formats
-              return (
-                <button
-                  key={categoryId}
-                  className={`group relative flex shrink-0 snap-start items-center gap-2 sm:gap-3 rounded-2xl border px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${active
-                      ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
-                      : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
-                    }`}
-                  onClick={() => categoryName && onCategoryChange?.(categoryName)}
-                >
-                  <span className={`text-base sm:text-lg transition-transform group-hover:scale-110 ${active ? 'animate-pulse' : ''}`}>
-                    {category.icon}
-                  </span>
-                  <div className="flex items-center justify-center">
-                    <span className="leading-tight whitespace-nowrap">{categoryName || 'Category'}</span>
-                  </div>
-                  {active && (
-                    <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping" />
-                  )}
-                </button>
-              );
-            })}
+            {safeCategories.length > 0 ? (
+              safeCategories.map((category) => {
+                const categoryName = category?.name ?? '';
+                const active = categoryName && selectedCategoryValue === categoryName.toLowerCase();
+                const categoryId = category?._id || category?.id; // Handle both API and static formats
+                return (
+                  <button
+                    key={categoryId}
+                    className={`group relative flex shrink-0 snap-start items-center gap-2 sm:gap-3 rounded-2xl border px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${active
+                        ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
+                        : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
+                      }`}
+                    onClick={() => categoryName && onCategoryChange?.(categoryName)}
+                  >
+                    <span className={`text-base sm:text-lg transition-transform group-hover:scale-110 ${active ? 'animate-pulse' : ''}`}>
+                      {category.icon || '🍽️'}
+                    </span>
+                    <div className="flex items-center justify-center">
+                      <span className="leading-tight whitespace-nowrap">{categoryName || 'Category'}</span>
+                    </div>
+                    {active && (
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping" />
+                    )}
+                  </button>
+                );
+              })
+            ) : (
+              <div className="flex items-center justify-center w-full py-8">
+                <div className="text-center">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-emerald-500 mx-auto mb-4"></div>
+                  <p className="text-slate-600 text-sm">Loading categories...</p>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

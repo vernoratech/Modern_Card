@@ -26,20 +26,33 @@ const ProductDetails = () => {
       try {
         // Use API response data if available
         let menuItems = [];
-        if (restaurantMenuItemsResponse?.data && Array.isArray(restaurantMenuItemsResponse.data) && restaurantMenuItemsResponse.data.length > 0) {
+        if (restaurantMenuItemsResponse?.data?.items && Array.isArray(restaurantMenuItemsResponse.data.items) && restaurantMenuItemsResponse.data.items.length > 0) {
+          menuItems = restaurantMenuItemsResponse.data.items;
+        } else if (restaurantMenuItemsResponse?.data && Array.isArray(restaurantMenuItemsResponse.data) && restaurantMenuItemsResponse.data.length > 0) {
           menuItems = restaurantMenuItemsResponse.data;
         } else {
           // Fall back to static data for Preview Mode
           menuItems = menuData.menuItems;
         }
 
+        console.log('ProductDetails - Menu items loaded:', menuItems.length, 'items');
+        console.log('Looking for productId:', productId);
+
         // Find product - handle both API (_id) and static (id) data
         const foundProduct = menuItems.find(item => {
           const itemId = item._id || item.id;
-          return String(itemId) === productId;
+          const matches = String(itemId) === productId;
+          console.log('ProductDetails Debug:', {
+            productId,
+            itemId,
+            itemName: item.itemName || item.name,
+            matches
+          });
+          return matches;
         });
 
         if (foundProduct) {
+          console.log('Product found:', foundProduct.itemName || foundProduct.name);
           setProduct(foundProduct);
           setActiveImageIdx(0);
         } else {

@@ -103,16 +103,6 @@ export const menuData = {
             "createdAt": "2025-09-11T08:45:20.971Z",
             "updatedAt": "2025-09-13T10:45:55.242Z",
             "isDefault": 1
-        },
-        {
-            "_id": "68e16e2eb8037853e428d4b9",
-            "name": "Brijesh",
-            "restaurantId": "68c6b573b11dd29a3d7067a4",
-            "isActive": 1,
-            "isDefault": 0,
-            "createdAt": "2025-10-04T18:57:50.333Z",
-            "updatedAt": "2025-10-04T18:57:50.333Z",
-            "__v": 0
         }
     ]
   },
