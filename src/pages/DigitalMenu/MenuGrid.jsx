@@ -16,7 +16,7 @@ const MenuGrid = ({ items, onProductClick }) => {
         <h3 className="text-lg font-medium text-gray-900 mb-2">No items found</h3>
         <p className="text-gray-600 mb-6">We couldn't find any items matching your criteria.</p>
         <button 
-          className="px-6 py-2 bg-primary-600 text-white rounded-full font-medium hover:bg-primary-700 transition-colors"
+          className="px-6 py-2 bg-gray-200 text-gray-900 rounded-full font-medium hover:bg-gray-300 transition-colors"
           onClick={() => {
             // Reset filters logic here
             console.log('Reset filters clicked');

@@ -167,7 +167,7 @@ const DigitalMenu = () => {
 
   const heroStats = useMemo(() => {
     const totalItems = menuItemsData.length;
-    const categories = dynamicCategories.length > 0 ? `${dynamicCategories.length}+` : `${menuData.categories.length}+`;
+    const categories = (dynamicCategories?.length || 0) > 0 ? `${dynamicCategories.length}+` : `${menuData.categoriesApiResponse?.data?.length || 0}+`;
     const averageRating = (
       menuItemsData.reduce((acc, item) => acc + (item.rating || 0), 0) /
       (totalItems || 1)
@@ -178,7 +178,7 @@ const DigitalMenu = () => {
       categories,
       averageRating,
     };
-  }, [menuItemsData, dynamicCategories.length]);
+  }, [menuItemsData, dynamicCategories]);
 
   const showcaseItems = useMemo(() => {
     if (menuItemsData.length === 0) {
@@ -240,6 +240,7 @@ const DigitalMenu = () => {
     return {
       isApiMode,
       categories: isApiMode && dynamicCategories.length > 0 ? dynamicCategories : menuData.categories,
+      categoriesForStatic: menuData.categoriesApiResponse,
       isLoadingCategories: isApiMode && categoriesLoading
     };
   };
@@ -253,24 +254,25 @@ const DigitalMenu = () => {
       totalItems: items.length,
       selectedCategory,
       isApiMode,
-      categoriesLength: categories.length,
-      dynamicCategoriesLength: dynamicCategories.length
+      categoriesLength: categories?.length || 0,
+      dynamicCategoriesLength: dynamicCategories?.length || 0
     });
 
     // Filter by category
     if (selectedCategory !== 'all') {
       if (isApiMode && dynamicCategories.length > 0) {
-        // API mode with dynamic categories - only filter if categories are loaded
+        // API mode with dynamic categories
         console.log('🔍 API Mode: Using dynamic categories for filtering');
-        const categoryId = dynamicCategories.find(cat =>
+        const categoriesForStatic = getCurrentMode().categoriesForStatic;
+        const categoryId = categoriesForStatic?.data?.find(cat =>
           cat.name.toLowerCase() === selectedCategory.toLowerCase()
-        )?.id;
+        )?._id;
 
         if (categoryId) {
           console.log('Category mapping:', {
             selectedCategory,
             categoryId,
-            dynamicCategories: dynamicCategories.map(cat => ({ name: cat.name, id: cat.id }))
+            categoriesForStatic: categoriesForStatic?.data?.map(cat => ({ name: cat.name, id: cat._id }))
           });
 
           if (items.length > 0) {
@@ -290,14 +292,14 @@ const DigitalMenu = () => {
           }
         } else {
           console.log('❌ No matching category found for:', selectedCategory);
-          console.log('Available categories:', dynamicCategories.map(cat => cat.name));
+          console.log('Available categories:', categoriesForStatic?.data?.map(cat => cat.name));
         }
       } else if (!isApiMode) {
         // Static mode - use static categories for filtering
         console.log('🔍 Static Mode: Using static categories for filtering');
-        const categoryId = menuData.categories.find(cat =>
+        const categoryId = menuData.categoriesApiResponse?.data?.find(cat =>
           cat.name.toLowerCase() === selectedCategory.toLowerCase()
-        )?.id;
+        )?._id;
 
         if (items.length > 0) {
           // Try different data structures
@@ -514,7 +516,7 @@ const DigitalMenu = () => {
           <MenuHeader restaurant={restaurantResponse?.data || menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse} />
 
           <MenuFilters
-            categories={getCurrentMode().categories}
+            categories={getCurrentMode().categoriesForStatic?.data || getCurrentMode().categories}
             selectedCategory={selectedCategory}
             onCategoryChange={handleCategoryChange}
             searchQuery={searchQuery}
