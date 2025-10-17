@@ -10,6 +10,7 @@ import MenuNavbar from './MenuNavbar.jsx';
 import MenuHorizontalShowcase from './MenuHorizontalShowcase.jsx';
 import './DigitalMenu.css';
 import { MdOutlineTableBar } from "react-icons/md";
+import { fetchCategories } from '../../services/restaurantService.js';
 import { useRestaurantData } from '../../context/RestaurantDataContext.jsx';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext.jsx';
@@ -41,6 +42,8 @@ const DigitalMenu = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showTableBanner, setShowTableBanner] = useState(true)
   const [isInitializingFromUrl, setIsInitializingFromUrl] = useState(false)
+  const [dynamicCategories, setDynamicCategories] = useState([])
+  const [categoriesLoading, setCategoriesLoading] = useState(false)
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -66,6 +69,58 @@ const DigitalMenu = () => {
       setIdentifiers(identifiers);
     }
   }, [location.search, setIdentifiers]);
+
+  // Fetch dynamic categories when both restaurant_id and table_id are present
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const restaurantIdFromUrl = params.get('restaurant_id');
+    const tableIdFromUrl = params.get('table_id');
+
+    if (restaurantIdFromUrl && tableIdFromUrl && restaurantIdFromUrl !== restaurantId) {
+      setCategoriesLoading(true);
+      fetchCategories(restaurantIdFromUrl)
+        .then(response => {
+          if (response.success && response.data) {
+            // Transform API response to match expected format
+            const transformedCategories = response.data
+              .filter(category => category.isActive)
+              .map((category, index) => ({
+                id: category._id,
+                name: category.name,
+                icon: getCategoryIcon(category.name, index),
+                count: 0 // We don't have count in the API response
+              }));
+            setDynamicCategories(transformedCategories);
+          }
+        })
+        .catch(error => {
+          console.error('Error fetching categories:', error);
+          // Fall back to static categories on error
+          setDynamicCategories([]);
+        })
+        .finally(() => {
+          setCategoriesLoading(false);
+        });
+    }
+  }, [location.search, restaurantId]);
+
+  // Function to get appropriate icon for categories
+  const getCategoryIcon = (categoryName, index) => {
+    const iconMap = {
+      'Starters': '🥗',
+      'Main Course': '🍛',
+      'Beverages': '🥤',
+      'Desserts': '🍨',
+      'Sides': '🥘',
+      'Breakfast': '🥐',
+      'Healthy': '🥗',
+      'Kids': '🧸',
+      'Specials': '⭐',
+      'Bakery': '🥖'
+    };
+
+    return iconMap[categoryName] || '🍽️';
+  };
 
   useEffect(() => {
     if (!restaurantId && !tableId) {
@@ -112,7 +167,7 @@ const DigitalMenu = () => {
 
   const heroStats = useMemo(() => {
     const totalItems = menuItemsData.length;
-    const categories = `${menuData.categories.length}+`;
+    const categories = dynamicCategories.length > 0 ? `${dynamicCategories.length}+` : `${menuData.categories.length}+`;
     const averageRating = (
       menuItemsData.reduce((acc, item) => acc + (item.rating || 0), 0) /
       (totalItems || 1)
@@ -123,51 +178,148 @@ const DigitalMenu = () => {
       categories,
       averageRating,
     };
-  }, [menuItemsData]);
+  }, [menuItemsData, dynamicCategories.length]);
 
   const showcaseItems = useMemo(() => {
+    if (menuItemsData.length === 0) {
+      console.log('No menu items available for showcase');
+      return [];
+    }
+
     const shuffled = [...menuItemsData]
       .sort(() => Math.random() - 0.5)
       .slice(0, 8);
+
+    console.log('Showcase items created:', shuffled.length);
     return shuffled.map((item) => ({
       ...item,
       tag: item.isBestseller ? 'Best Seller' : item.isVeg ? 'Veg' : 'Popular',
     }));
   }, [menuItemsData]);
 
+  // Centralized data management for menu items
   useEffect(() => {
-    if (restaurantMenuItemsResponse?.data?.items && restaurantMenuItemsResponse.data.items.length > 0) {
-      setMenuItemsData(restaurantMenuItemsResponse.data.items);
-    } else if (!restaurantMenuItemsLoading && restaurantId) {
-      // If loading is complete but no data, fall back to dummy data
-      setMenuItemsData(menuData.menuItems);
+    const urlParams = new URLSearchParams(location.search);
+    const hasRestaurantParam = urlParams.get('restaurant_id');
+    const hasTableParam = urlParams.get('table_id');
+    const isApiMode = Boolean(hasRestaurantParam && hasTableParam);
+
+    console.log('Data management effect:', {
+      isApiMode,
+      apiResponse: restaurantMenuItemsResponse,
+      isLoading: restaurantMenuItemsLoading,
+      restaurantId
+    });
+
+    if (isApiMode) {
+      // API mode
+      if (restaurantMenuItemsResponse?.data && Array.isArray(restaurantMenuItemsResponse.data) && restaurantMenuItemsResponse.data.length > 0) {
+        console.log('✅ API Mode: Setting API data', restaurantMenuItemsResponse.data.length, 'items');
+        console.log('Sample API item:', restaurantMenuItemsResponse.data[0]);
+        setMenuItemsData(restaurantMenuItemsResponse.data);
+      } else if (!restaurantMenuItemsLoading && restaurantId) {
+        console.log('❌ API Mode: No data available');
+        console.log('API Response structure:', restaurantMenuItemsResponse);
+        setMenuItemsData([]);
+      }
+      // Don't set static data while in API mode
     } else {
-      // Default to dummy data for preview mode
+      // Static mode - always use static data
+      console.log('📄 Static Mode: Using menuData.js');
       setMenuItemsData(menuData.menuItems);
     }
-  }, [restaurantMenuItemsResponse, restaurantMenuItemsLoading, restaurantId]);
+  }, [restaurantMenuItemsResponse, restaurantMenuItemsLoading, restaurantId, location.search]);
+
+  // Helper function to determine current mode and get appropriate categories
+  const getCurrentMode = () => {
+    const urlParams = new URLSearchParams(location.search);
+    const hasRestaurantParam = urlParams.get('restaurant_id');
+    const hasTableParam = urlParams.get('table_id');
+    const isApiMode = Boolean(hasRestaurantParam && hasTableParam);
+
+    return {
+      isApiMode,
+      categories: isApiMode && dynamicCategories.length > 0 ? dynamicCategories : menuData.categories,
+      isLoadingCategories: isApiMode && categoriesLoading
+    };
+  };
 
   // Filter menu items based on category and search
   useEffect(() => {
     let items = menuItemsData;
+    const { isApiMode, categories } = getCurrentMode();
+
+    console.log('Filtering items:', {
+      totalItems: items.length,
+      selectedCategory,
+      isApiMode,
+      categoriesLength: categories.length,
+      dynamicCategoriesLength: dynamicCategories.length
+    });
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      // For API data, category is productCategory, for dummy data it's categoryId
-      if (items.length > 0 && items[0].productCategory) {
-        // API data structure
+      if (isApiMode && dynamicCategories.length > 0) {
+        // API mode with dynamic categories - only filter if categories are loaded
+        console.log('🔍 API Mode: Using dynamic categories for filtering');
+        const categoryId = dynamicCategories.find(cat =>
+          cat.name.toLowerCase() === selectedCategory.toLowerCase()
+        )?.id;
+
+        if (categoryId) {
+          console.log('Category mapping:', {
+            selectedCategory,
+            categoryId,
+            dynamicCategories: dynamicCategories.map(cat => ({ name: cat.name, id: cat.id }))
+          });
+
+          if (items.length > 0) {
+            // Try API data structure first
+            if (items[0].productCategory !== undefined) {
+              console.log('Filtering API data by productCategory');
+              console.log('Sample item productCategory:', items[0].productCategory);
+              items = items.filter(item => item.productCategory === categoryId);
+            } else if (items[0].categoryId !== undefined) {
+              console.log('Filtering API data by categoryId');
+              console.log('Sample item categoryId:', items[0].categoryId);
+              items = items.filter(item => item.categoryId === categoryId);
+            } else {
+              console.log('⚠️ API data structure not recognized');
+              console.log('Sample item keys:', Object.keys(items[0]));
+            }
+          }
+        } else {
+          console.log('❌ No matching category found for:', selectedCategory);
+          console.log('Available categories:', dynamicCategories.map(cat => cat.name));
+        }
+      } else if (!isApiMode) {
+        // Static mode - use static categories for filtering
+        console.log('🔍 Static Mode: Using static categories for filtering');
         const categoryId = menuData.categories.find(cat =>
           cat.name.toLowerCase() === selectedCategory.toLowerCase()
         )?.id;
-        items = items.filter(item => item.productCategory === categoryId);
+
+        if (items.length > 0) {
+          // Try different data structures
+          if (items[0].productCategory !== undefined) {
+            console.log('Filtering by productCategory');
+            items = items.filter(item => item.productCategory === categoryId);
+          } else if (items[0].categoryId !== undefined) {
+            console.log('Filtering by categoryId');
+            items = items.filter(item => item.categoryId === categoryId);
+          } else if (items[0].category !== undefined) {
+            console.log('Filtering by category name');
+            items = items.filter(item => item.category?.toLowerCase() === selectedCategory.toLowerCase());
+          } else {
+            console.log('⚠️ Data structure not recognized');
+          }
+        }
       } else {
-        // Dummy data structure
-        const categoryId = menuData.categories.find(cat =>
-          cat.name.toLowerCase() === selectedCategory.toLowerCase()
-        )?.id;
-        items = items.filter(item => item.categoryId === categoryId);
+        console.log('⏳ API mode but categories not loaded yet');
       }
     }
+
+    console.log('✅ Items after category filtering:', items.length);
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -252,7 +404,8 @@ const DigitalMenu = () => {
   }, [isInitializingFromUrl, restaurantLoading, tableLoading, restaurantResponse, restaurantError, tableId]);
 
   const hasRestaurantParam = Boolean(new URLSearchParams(location.search).get('restaurant_id'));
-  const isLoadingIdentifiers = (hasRestaurantParam || isInitializingFromUrl) &&
+  const hasTableParam = Boolean(new URLSearchParams(location.search).get('table_id'));
+  const isLoadingIdentifiers = (hasRestaurantParam && hasTableParam) &&
     (restaurantLoading || tableLoading || (isInitializingFromUrl && !restaurantError && !restaurantResponse));
 
   return (
@@ -296,7 +449,7 @@ const DigitalMenu = () => {
 
       ) : (
         <div className="menu-container max-w-7xl mx-auto px-3 sm:px-4 md:px-6 lg:px-8 xl:px-12 2xl:px-16">
-          <MenuNavbar restaurant={menuData.restaurant} restaurantResponse={restaurantResponse} />
+          <MenuNavbar restaurant={restaurantResponse?.data || menuData.restaurant} restaurantResponse={restaurantResponse} />
 
           {tableData && showTableBanner && (
             <div className="fixed bottom-4 right-4 z-40 w-[85vw] max-w-xs sm:max-w-sm pointer-events-none sm:bottom-6 sm:right-6">
@@ -358,10 +511,10 @@ const DigitalMenu = () => {
             </button>
           )}
 
-          <MenuHeader restaurant={menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse} />
+          <MenuHeader restaurant={restaurantResponse?.data || menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse} />
 
           <MenuFilters
-            categories={menuData.categories}
+            categories={getCurrentMode().categories}
             selectedCategory={selectedCategory}
             onCategoryChange={handleCategoryChange}
             searchQuery={searchQuery}
@@ -382,7 +535,7 @@ const DigitalMenu = () => {
             <ProductModal
               product={selectedProduct}
               onClose={closeModal}
-              restaurant={menuData.restaurant}
+              restaurant={restaurantResponse?.data || menuData.restaurant}
             />
           )}
 

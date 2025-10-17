@@ -11,6 +11,7 @@ const MenuFilters = ({
   onSearchChange,
   totalItems
 }) => {
+  // Use categories prop (dynamic or static based on what's passed)
   const safeCategories = Array.isArray(categories) ? categories.filter(Boolean) : [];
   const selectedCategoryValue = (selectedCategory ?? 'all').toLowerCase();
 
