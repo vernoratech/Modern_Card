@@ -42,6 +42,7 @@ const DigitalMenu = () => {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [showTableBanner, setShowTableBanner] = useState(true)
   const [isInitializingFromUrl, setIsInitializingFromUrl] = useState(false)
+  const [isApiMode, setIsApiMode] = useState(false)
   const [dynamicCategories, setDynamicCategories] = useState([])
   const [categoriesLoading, setCategoriesLoading] = useState(false)
 
@@ -70,15 +71,19 @@ const DigitalMenu = () => {
     }
   }, [location.search, setIdentifiers]);
 
-  // Fetch dynamic categories when both restaurant_id and table_id are present
+  // Fetch dynamic categories when we have restaurant_id (from URL or localStorage)
   useEffect(() => {
-    const params = new URLSearchParams(location.search);
-    const restaurantIdFromUrl = params.get('restaurant_id');
-    const tableIdFromUrl = params.get('table_id');
+    // Check if we have restaurant_id from URL or localStorage
+    const urlParams = new URLSearchParams(location.search);
+    const urlRestaurantId = urlParams.get('restaurant_id');
+    const storedData = getStorageWithTTL();
+    const storedRestaurantId = storedData?.restaurantId;
 
-    if (restaurantIdFromUrl && tableIdFromUrl && restaurantIdFromUrl !== restaurantId) {
+    const currentRestaurantId = urlRestaurantId || storedRestaurantId;
+
+    if (currentRestaurantId && currentRestaurantId !== restaurantId) {
       setCategoriesLoading(true);
-      fetchCategories(restaurantIdFromUrl)
+      fetchCategories(currentRestaurantId)
         .then(response => {
           if (response.success && response.data) {
             // Transform API response to match expected format
@@ -91,6 +96,12 @@ const DigitalMenu = () => {
                 count: 0 // We don't have count in the API response
               }));
             setDynamicCategories(transformedCategories);
+
+            // Store categories in localStorage along with restaurant/table IDs
+            const storedData = getStorageWithTTL();
+            if (storedData && storedData.restaurantId && storedData.tableId) {
+              setStorageWithTTL(storedData.restaurantId, storedData.tableId, transformedCategories);
+            }
           }
         })
         .catch(error => {
@@ -197,58 +208,195 @@ const DigitalMenu = () => {
     }));
   }, [menuItemsData]);
 
+// Utility functions for localStorage with TTL
+const STORAGE_KEY = 'restaurant_session';
+const TTL_HOURS = 1;
+
+const setStorageWithTTL = (restaurantId, tableId, categories = null) => {
+  const expirationTime = Date.now() + (TTL_HOURS * 60 * 60 * 1000); // 1 hour from now
+  const data = {
+    restaurantId,
+    tableId,
+    expirationTime,
+    categories: categories ? JSON.stringify(categories) : null
+  };
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+};
+
+const getStorageWithTTL = () => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (!stored) return null;
+
+    const data = JSON.parse(stored);
+    if (Date.now() > data.expirationTime) {
+      localStorage.removeItem(STORAGE_KEY);
+      return null;
+    }
+
+    return {
+      restaurantId: data.restaurantId,
+      tableId: data.tableId,
+      categories: data.categories ? JSON.parse(data.categories) : null
+    };
+  } catch (error) {
+    console.error('Error reading from localStorage:', error);
+    return null;
+  }
+};
+
+const clearStorage = () => {
+  localStorage.removeItem(STORAGE_KEY);
+};
+
   // Centralized data management for menu items
   useEffect(() => {
+    // Check sources in order of priority: URL → localStorage → preview mode
+    let restaurantId = null;
+    let tableId = null;
+    let apiModeSource = 'none';
+
+    // 1. Check URL parameters first
     const urlParams = new URLSearchParams(location.search);
-    const hasRestaurantParam = urlParams.get('restaurant_id');
-    const hasTableParam = urlParams.get('table_id');
-    const isApiMode = Boolean(hasRestaurantParam && hasTableParam);
+    const urlRestaurantId = urlParams.get('restaurant_id');
+    const urlTableId = urlParams.get('table_id');
+
+    if (urlRestaurantId && urlTableId) {
+      restaurantId = urlRestaurantId;
+      tableId = urlTableId;
+      apiModeSource = 'url';
+
+      // Store in localStorage for future use
+      setStorageWithTTL(restaurantId, tableId);
+      setIsApiMode(true);
+
+      // Set identifiers in context for API calls
+      setIdentifiers({ restaurantId, tableId });
+    } else {
+      // 2. Check localStorage if URL params not available
+      const storedData = getStorageWithTTL();
+      if (storedData && storedData.restaurantId && storedData.tableId) {
+        restaurantId = storedData.restaurantId;
+        tableId = storedData.tableId;
+        apiModeSource = 'localStorage';
+        setIsApiMode(true);
+
+        // Set identifiers in context for API calls
+        setIdentifiers({ restaurantId, tableId });
+      } else {
+        // 3. Preview mode - no API parameters
+        apiModeSource = 'preview';
+        setIsApiMode(false);
+      }
+    }
 
     console.log('Data management effect:', {
-      isApiMode,
-      apiResponse: restaurantMenuItemsResponse,
-      isLoading: restaurantMenuItemsLoading,
+      apiModeSource,
       restaurantId,
-      currentMenuItemsLength: menuItemsData.length
+      tableId,
+      urlParams: { restaurant_id: urlRestaurantId, table_id: urlTableId },
+      currentMenuItemsLength: menuItemsData.length,
+      persistentIsApiMode: isApiMode,
+      contextRestaurantId: restaurantId,
+      contextTableId: tableId
     });
 
-    if (isApiMode) {
-      // API mode
-      if (restaurantMenuItemsResponse?.data?.items && Array.isArray(restaurantMenuItemsResponse.data.items) && restaurantMenuItemsResponse.data.items.length > 0) {
-        console.log('✅ API Mode: Setting API data', restaurantMenuItemsResponse.data.items.length, 'items');
-        console.log('Sample API item:', restaurantMenuItemsResponse.data.items[0]);
-        setMenuItemsData(restaurantMenuItemsResponse.data.items);
-      } else if (restaurantMenuItemsResponse?.data && Array.isArray(restaurantMenuItemsResponse.data) && restaurantMenuItemsResponse.data.length > 0) {
-        // Fallback for direct array format
-        console.log('✅ API Mode: Setting API data (direct array)', restaurantMenuItemsResponse.data.length, 'items');
-        console.log('Sample API item:', restaurantMenuItemsResponse.data[0]);
-        setMenuItemsData(restaurantMenuItemsResponse.data);
-      } else if (!restaurantMenuItemsLoading && restaurantId) {
-        console.log('❌ API Mode: No data available');
-        console.log('API Response structure:', restaurantMenuItemsResponse);
-        setMenuItemsData([]);
+    if (isApiMode && restaurantId && tableId) {
+      // API mode - check if we need to load data
+      const hasApiData = Boolean(restaurantMenuItemsResponse?.data?.items?.length > 0 || restaurantMenuItemsResponse?.data?.length > 0);
+
+      if (hasApiData) {
+        // We already have API data loaded
+        if (restaurantMenuItemsResponse?.data?.items && Array.isArray(restaurantMenuItemsResponse.data.items) && restaurantMenuItemsResponse.data.items.length > 0) {
+          console.log('✅ API Mode: Using existing API data', restaurantMenuItemsResponse.data.items.length, 'items');
+          setMenuItemsData(restaurantMenuItemsResponse.data.items);
+        } else if (restaurantMenuItemsResponse?.data && Array.isArray(restaurantMenuItemsResponse.data) && restaurantMenuItemsResponse.data.length > 0) {
+          console.log('✅ API Mode: Using existing API data (direct array)', restaurantMenuItemsResponse.data.length, 'items');
+          setMenuItemsData(restaurantMenuItemsResponse.data);
+        }
+      } else if (!restaurantMenuItemsLoading) {
+        // Need to load API data but don't have it yet
+        console.log('⏳ API Mode: Data should be loading from API calls');
       }
       // Don't set static data while in API mode
     } else {
-      // Static mode - always use static data
-      console.log('📄 Static Mode: Using menuData.js');
+      // Preview mode - always use static data
+      console.log('📄 Preview Mode: Using menuData.js');
       setMenuItemsData(menuData.menuItems);
     }
-  }, [restaurantMenuItemsResponse, restaurantMenuItemsLoading, restaurantId, location.search]);
+  }, [
+    restaurantMenuItemsResponse,
+    restaurantMenuItemsLoading,
+    location.search,
+    setIdentifiers,
+    restaurantId,
+    tableId,
+    isApiMode
+  ]);
 
-  // Helper function to determine current mode and get appropriate categories
+  // Maintain API mode state based on localStorage data
+  useEffect(() => {
+    const storedData = getStorageWithTTL();
+    if (storedData && storedData.restaurantId && storedData.tableId && !isApiMode) {
+      setIsApiMode(true);
+    } else if (!storedData && isApiMode) {
+      setIsApiMode(false);
+    }
+  }, [location.search, isApiMode]);
   const getCurrentMode = () => {
+    // Check sources in order of priority: URL → localStorage → preview mode
+    let restaurantId = null;
+    let tableId = null;
+
+    // 1. Check URL parameters first
     const urlParams = new URLSearchParams(location.search);
-    const hasRestaurantParam = urlParams.get('restaurant_id');
-    const hasTableParam = urlParams.get('table_id');
-    const isApiMode = Boolean(hasRestaurantParam && hasTableParam);
+    const urlRestaurantId = urlParams.get('restaurant_id');
+    const urlTableId = urlParams.get('table_id');
+
+    if (urlRestaurantId && urlTableId) {
+      restaurantId = urlRestaurantId;
+      tableId = urlTableId;
+    } else {
+      // 2. Check localStorage if URL params not available
+      const storedData = getStorageWithTTL();
+      if (storedData && storedData.restaurantId && storedData.tableId) {
+        restaurantId = storedData.restaurantId;
+        tableId = storedData.tableId;
+      }
+    }
+
+    // If we have API data loaded, we're in API mode regardless of source
+    const hasApiData = Boolean(restaurantMenuItemsResponse?.data?.items?.length > 0 || restaurantMenuItemsResponse?.data?.length > 0);
+    const currentIsApiMode = Boolean(restaurantId && tableId) || hasApiData;
+
+    // Get categories based on mode - check localStorage first for API mode
+    let categories = menuData.categories; // Default to static
+    if (currentIsApiMode) {
+      if (dynamicCategories && dynamicCategories.length > 0) {
+        // Use currently loaded dynamic categories
+        categories = dynamicCategories;
+      } else {
+        // Check localStorage for cached categories
+        const storedData = getStorageWithTTL();
+        if (storedData && storedData.categories) {
+          categories = storedData.categories;
+          // Update state with cached categories
+          setDynamicCategories(storedData.categories);
+        } else {
+          // Fall back to static API response format
+          categories = menuData.categoriesApiResponse?.data || [];
+        }
+      }
+    }
 
     return {
-      isApiMode,
-      categories: isApiMode && dynamicCategories?.length > 0 ? dynamicCategories : menuData.categories,
+      isApiMode: currentIsApiMode,
+      categories: categories,
       dynamicCategories: dynamicCategories || [],
       categoriesForStatic: menuData.categoriesApiResponse,
-      isLoadingCategories: isApiMode && categoriesLoading
+      isLoadingCategories: currentIsApiMode && categoriesLoading,
+      restaurantId,
+      tableId
     };
   };
 
@@ -269,11 +417,10 @@ const DigitalMenu = () => {
 
     // Filter by category
     if (selectedCategory !== 'all') {
-      if (isApiMode && dynamicCategories.length > 0) {
-        // API mode with dynamic categories
-        console.log('🔍 API Mode: Using dynamic categories for filtering');
-        const categoriesForStatic = getCurrentMode().categoriesForStatic;
-        const categoryId = categoriesForStatic?.data?.find(cat =>
+      if (isApiMode) {
+        // API mode - use API categories for filtering
+        console.log('🔍 API Mode: Using API categories for filtering');
+        const categoryId = categories.find(cat =>
           cat.name.toLowerCase() === selectedCategory.toLowerCase()
         )?._id;
 
@@ -281,7 +428,7 @@ const DigitalMenu = () => {
           console.log('Category mapping:', {
             selectedCategory,
             categoryId,
-            categoriesForStatic: categoriesForStatic?.data?.map(cat => ({ name: cat.name, id: cat._id }))
+            availableCategories: categories.map(cat => ({ name: cat.name, id: cat._id }))
           });
 
           if (items.length > 0) {
@@ -301,11 +448,11 @@ const DigitalMenu = () => {
           }
         } else {
           console.log('❌ No matching category found for:', selectedCategory);
-          console.log('Available categories:', categoriesForStatic?.data?.map(cat => cat.name));
+          console.log('Available categories:', categories.map(cat => cat.name));
           // If no matching category found, return all items
           items = items.filter(item => true);
         }
-      } else if (!isApiMode) {
+      } else {
         // Static mode - use static categories for filtering
         console.log('🔍 Static Mode: Using static categories for filtering');
         const categoryId = menuData.categoriesApiResponse?.data?.find(cat =>
@@ -334,8 +481,6 @@ const DigitalMenu = () => {
           // If no matching category found, return all items
           items = items.filter(item => true);
         }
-      } else {
-        console.log('⏳ API mode but categories not loaded yet');
       }
     }
 
@@ -534,7 +679,7 @@ const DigitalMenu = () => {
           <MenuHeader restaurant={restaurantResponse?.data || menuData.restaurant} stats={heroStats} restaurantResponse={restaurantResponse} />
 
           <MenuFilters
-            categories={getCurrentMode().isApiMode ? (getCurrentMode().dynamicCategories?.length > 0 ? getCurrentMode().dynamicCategories : getCurrentMode().categoriesForStatic?.data || []) : getCurrentMode().categories}
+            categories={getCurrentMode().categories}
             selectedCategory={selectedCategory}
             onCategoryChange={handleCategoryChange}
             searchQuery={searchQuery}

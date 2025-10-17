@@ -16,7 +16,7 @@ export const menuData = {
     "data": [
         {
             "_id": "68e0d4772ea12265636db3df",
-            "name": "Starters & Appetizers",
+            "name": "Starters & Appetizers(D)",
             "restaurantId": null,
             "isActive": 1,
             "createdAt": "2025-09-11T08:45:20.971Z",
@@ -25,7 +25,7 @@ export const menuData = {
         },
         {
             "_id": "68e0d4772ea12265636db3e0",
-            "name": "Main Course",
+            "name": "Main Course(D)",
             "restaurantId": null,
             "isActive": 1,
             "createdAt": "2025-09-11T08:45:20.971Z",
@@ -34,70 +34,7 @@ export const menuData = {
         },
         {
             "_id": "68e0d4772ea12265636db3e1",
-            "name": "Sides",
-            "restaurantId": null,
-            "isActive": 1,
-            "createdAt": "2025-09-11T08:45:20.971Z",
-            "updatedAt": "2025-09-13T10:45:55.242Z",
-            "isDefault": 1
-        },
-        {
-            "_id": "68e0d4772ea12265636db3e2",
-            "name": "Desserts",
-            "restaurantId": null,
-            "isActive": 1,
-            "createdAt": "2025-09-11T08:45:20.971Z",
-            "updatedAt": "2025-09-13T10:45:55.242Z",
-            "isDefault": 1
-        },
-        {
-            "_id": "68e0d4772ea12265636db3e3",
-            "name": "Beverages",
-            "restaurantId": null,
-            "isActive": 1,
-            "createdAt": "2025-09-11T08:45:20.971Z",
-            "updatedAt": "2025-09-13T10:45:55.242Z",
-            "isDefault": 1
-        },
-        {
-            "_id": "68e0d4772ea12265636db3e4",
-            "name": "Breakfast & Brunch",
-            "restaurantId": null,
-            "isActive": 1,
-            "createdAt": "2025-09-11T08:45:20.971Z",
-            "updatedAt": "2025-09-13T10:45:55.242Z",
-            "isDefault": 1
-        },
-        {
-            "_id": "68e0d4772ea12265636db3e5",
-            "name": "Healthy & Diet",
-            "restaurantId": null,
-            "isActive": 1,
-            "createdAt": "2025-09-11T08:45:20.971Z",
-            "updatedAt": "2025-09-13T10:45:55.242Z",
-            "isDefault": 1
-        },
-        {
-            "_id": "68e0d4772ea12265636db3e6",
-            "name": "Kids Menu",
-            "restaurantId": null,
-            "isActive": 1,
-            "createdAt": "2025-09-11T08:45:20.971Z",
-            "updatedAt": "2025-09-13T10:45:55.242Z",
-            "isDefault": 1
-        },
-        {
-            "_id": "68e0d4772ea12265636db3e7",
-            "name": "Specials",
-            "restaurantId": null,
-            "isActive": 1,
-            "createdAt": "2025-09-11T08:45:20.971Z",
-            "updatedAt": "2025-09-13T10:45:55.242Z",
-            "isDefault": 1
-        },
-        {
-            "_id": "68e0d4772ea12265636db3e8",
-            "name": "Bakery & Café",
+            "name": "Sides(D)",
             "restaurantId": null,
             "isActive": 1,
             "createdAt": "2025-09-11T08:45:20.971Z",
