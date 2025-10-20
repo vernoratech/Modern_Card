@@ -45,6 +45,17 @@ const DigitalMenu = () => {
   const [isApiMode, setIsApiMode] = useState(false)
   const [dynamicCategories, setDynamicCategories] = useState([])
   const [categoriesLoading, setCategoriesLoading] = useState(false)
+  const [lastFetchedRestaurantId, setLastFetchedRestaurantId] = useState(null)
+
+  useEffect(() => {
+    const storedData = getStorageWithTTL();
+    if (storedData?.categories?.length) {
+      setDynamicCategories(storedData.categories);
+      if (storedData.restaurantId) {
+        setLastFetchedRestaurantId(storedData.restaurantId);
+      }
+    }
+  }, [])
 
   useEffect(() => {
     const params = new URLSearchParams(location.search);
@@ -73,47 +84,52 @@ const DigitalMenu = () => {
 
   // Fetch dynamic categories when we have restaurant_id (from URL or localStorage)
   useEffect(() => {
-    // Check if we have restaurant_id from URL or localStorage
     const urlParams = new URLSearchParams(location.search);
     const urlRestaurantId = urlParams.get('restaurant_id');
+    const urlTableId = urlParams.get('table_id');
     const storedData = getStorageWithTTL();
     const storedRestaurantId = storedData?.restaurantId;
+    const storedTableId = storedData?.tableId;
 
-    const currentRestaurantId = urlRestaurantId || storedRestaurantId;
-
-    if (currentRestaurantId && currentRestaurantId !== restaurantId) {
-      setCategoriesLoading(true);
-      fetchCategories(currentRestaurantId)
-        .then(response => {
-          if (response.success && response.data) {
-            // Transform API response to match expected format
-            const transformedCategories = response.data
-              .filter(category => category.isActive)
-              .map((category, index) => ({
-                id: category._id,
-                name: category.name,
-                icon: getCategoryIcon(category.name, index),
-                count: 0 // We don't have count in the API response
-              }));
-            setDynamicCategories(transformedCategories);
-
-            // Store categories in localStorage along with restaurant/table IDs
-            const storedData = getStorageWithTTL();
-            if (storedData && storedData.restaurantId && storedData.tableId) {
-              setStorageWithTTL(storedData.restaurantId, storedData.tableId, transformedCategories);
-            }
-          }
-        })
-        .catch(error => {
-          console.error('Error fetching categories:', error);
-          // Fall back to static categories on error
-          setDynamicCategories([]);
-        })
-        .finally(() => {
-          setCategoriesLoading(false);
-        });
+    const currentRestaurantId = urlRestaurantId || restaurantId || storedRestaurantId;
+    if (!currentRestaurantId) {
+      return;
     }
-  }, [location.search, restaurantId]);
+
+    const hasCachedCategories = dynamicCategories.length > 0 || storedData?.categories?.length > 0;
+    if (lastFetchedRestaurantId === currentRestaurantId && hasCachedCategories) {
+      return;
+    }
+
+    setCategoriesLoading(true);
+    fetchCategories(currentRestaurantId)
+      .then(response => {
+        if (response.success && response.data) {
+          const transformedCategories = response.data
+            .filter(category => category.isActive)
+            .map((category, index) => ({
+              id: category._id,
+              _id: category._id,
+              name: category.name,
+              icon: getCategoryIcon(category.name, index),
+              count: category.count ?? 0
+            }));
+
+          setDynamicCategories(transformedCategories);
+          setLastFetchedRestaurantId(currentRestaurantId);
+
+          const tableIdentifier = urlTableId || tableId || storedTableId || null;
+          setStorageWithTTL(currentRestaurantId, tableIdentifier, transformedCategories);
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching categories:', error);
+        setDynamicCategories([]);
+      })
+      .finally(() => {
+        setCategoriesLoading(false);
+      });
+  }, [location.search, restaurantId, tableId, dynamicCategories.length, lastFetchedRestaurantId]);
 
   // Function to get appropriate icon for categories
   const getCategoryIcon = (categoryName, index) => {
@@ -370,7 +386,13 @@ const clearStorage = () => {
     const currentIsApiMode = Boolean(restaurantId && tableId) || hasApiData;
 
     // Get categories based on mode - check localStorage first for API mode
-    let categories = menuData.categories; // Default to static
+    let categories = (menuData.categoriesApiResponse?.data || []).map((category, index) => ({
+      id: category._id,
+      _id: category._id,
+      name: category.name,
+      icon: getCategoryIcon(category.name, index),
+      count: category.count ?? 0
+    }));
     if (currentIsApiMode) {
       if (dynamicCategories && dynamicCategories.length > 0) {
         // Use currently loaded dynamic categories
@@ -380,11 +402,14 @@ const clearStorage = () => {
         const storedData = getStorageWithTTL();
         if (storedData && storedData.categories) {
           categories = storedData.categories;
-          // Update state with cached categories
-          setDynamicCategories(storedData.categories);
         } else {
-          // Fall back to static API response format
-          categories = menuData.categoriesApiResponse?.data || [];
+          categories = (menuData.categoriesApiResponse?.data || []).map((category, index) => ({
+            id: category._id,
+            _id: category._id,
+            name: category.name,
+            icon: getCategoryIcon(category.name, index),
+            count: category.count ?? 0
+          }));
         }
       }
     }
