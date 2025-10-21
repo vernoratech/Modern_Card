@@ -10,7 +10,7 @@ const MenuGrid = ({ items, onProductClick }) => {
     >
       <div className="bg-gray-100 p-6 rounded-2xl max-w-md w-full">
         <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-primary-50 flex items-center justify-center">
-          <GiSadCrab className='w-10 h-10 text-gray-600 '/>
+          <GiSadCrab className='w-10 h-10 text-gray-600 ' />
         </div>
         <h3 className="text-lg font-medium text-gray-900 mb-2">No items found</h3>
         <p className="text-gray-600 mb-6">We couldn't find any items matching your criteria.</p>

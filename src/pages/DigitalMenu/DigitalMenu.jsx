@@ -170,22 +170,10 @@ const DigitalMenu = () => {
   }, [restaurantId, tableId, location.pathname, location.search, location.state, navigate]);
 
   useEffect(() => {
-    if (restaurantResponse) {
-      console.log('Restaurant API response:', restaurantResponse);
-    }
-  }, [restaurantResponse]);
-
-  useEffect(() => {
     if (restaurantError) {
       console.error('Error fetching restaurant menu data:', restaurantError);
     }
   }, [restaurantError]);
-
-  useEffect(() => {
-    if (tableResponse) {
-      console.log('Table API response:', tableResponse);
-    }
-  }, [tableResponse]);
 
   useEffect(() => {
     if (tableError) {
@@ -209,7 +197,6 @@ const DigitalMenu = () => {
 
   const showcaseItems = useMemo(() => {
     if (menuItemsData.length === 0) {
-      console.log('No menu items available for showcase');
       return [];
     }
 
@@ -224,46 +211,46 @@ const DigitalMenu = () => {
     }));
   }, [menuItemsData]);
 
-// Utility functions for localStorage with TTL
-const STORAGE_KEY = 'restaurant_session';
-const TTL_HOURS = 1;
+  // Utility functions for localStorage with TTL
+  const STORAGE_KEY = 'restaurant_session';
+  const TTL_HOURS = 1;
 
-const setStorageWithTTL = (restaurantId, tableId, categories = null) => {
-  const expirationTime = Date.now() + (TTL_HOURS * 60 * 60 * 1000); // 1 hour from now
-  const data = {
-    restaurantId,
-    tableId,
-    expirationTime,
-    categories: categories ? JSON.stringify(categories) : null
+  const setStorageWithTTL = (restaurantId, tableId, categories = null) => {
+    const expirationTime = Date.now() + (TTL_HOURS * 60 * 60 * 1000); // 1 hour from now
+    const data = {
+      restaurantId,
+      tableId,
+      expirationTime,
+      categories: categories ? JSON.stringify(categories) : null
+    };
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
   };
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-};
 
-const getStorageWithTTL = () => {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (!stored) return null;
+  const getStorageWithTTL = () => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (!stored) return null;
 
-    const data = JSON.parse(stored);
-    if (Date.now() > data.expirationTime) {
-      localStorage.removeItem(STORAGE_KEY);
+      const data = JSON.parse(stored);
+      if (Date.now() > data.expirationTime) {
+        localStorage.removeItem(STORAGE_KEY);
+        return null;
+      }
+
+      return {
+        restaurantId: data.restaurantId,
+        tableId: data.tableId,
+        categories: data.categories ? JSON.parse(data.categories) : null
+      };
+    } catch (error) {
+      console.error('Error reading from localStorage:', error);
       return null;
     }
+  };
 
-    return {
-      restaurantId: data.restaurantId,
-      tableId: data.tableId,
-      categories: data.categories ? JSON.parse(data.categories) : null
-    };
-  } catch (error) {
-    console.error('Error reading from localStorage:', error);
-    return null;
-  }
-};
-
-const clearStorage = () => {
-  localStorage.removeItem(STORAGE_KEY);
-};
+  const clearStorage = () => {
+    localStorage.removeItem(STORAGE_KEY);
+  };
 
   // Centralized data management for menu items
   useEffect(() => {
@@ -306,17 +293,6 @@ const clearStorage = () => {
       }
     }
 
-    console.log('Data management effect:', {
-      apiModeSource,
-      restaurantId,
-      tableId,
-      urlParams: { restaurant_id: urlRestaurantId, table_id: urlTableId },
-      currentMenuItemsLength: menuItemsData.length,
-      persistentIsApiMode: isApiMode,
-      contextRestaurantId: restaurantId,
-      contextTableId: tableId
-    });
-
     if (isApiMode && restaurantId && tableId) {
       // API mode - check if we need to load data
       const hasApiData = Boolean(restaurantMenuItemsResponse?.data?.items?.length > 0 || restaurantMenuItemsResponse?.data?.length > 0);
@@ -332,7 +308,6 @@ const clearStorage = () => {
         }
       } else if (!restaurantMenuItemsLoading) {
         // Need to load API data but don't have it yet
-        console.log('⏳ API Mode: Data should be loading from API calls');
       }
       // Don't set static data while in API mode
     } else {
@@ -430,50 +405,25 @@ const clearStorage = () => {
     let items = menuItemsData;
     const { isApiMode, categories } = getCurrentMode();
 
-    console.log('Filtering items:', {
-      totalItems: items.length,
-      selectedCategory,
-      isApiMode,
-      categoriesLength: categories?.length || 0,
-      dynamicCategoriesLength: dynamicCategories?.length || 0,
-      menuItemsDataLength: menuItemsData.length,
-      sampleItem: items[0] ? { id: items[0]._id, name: items[0].itemName, category: items[0].productCategory } : null
-    });
-
     // Filter by category
     if (selectedCategory !== 'all') {
       if (isApiMode) {
         // API mode - use API categories for filtering
-        console.log('🔍 API Mode: Using API categories for filtering');
         const categoryId = categories.find(cat =>
           cat.name.toLowerCase() === selectedCategory.toLowerCase()
         )?._id;
 
         if (categoryId) {
-          console.log('Category mapping:', {
-            selectedCategory,
-            categoryId,
-            availableCategories: categories.map(cat => ({ name: cat.name, id: cat._id }))
-          });
-
           if (items.length > 0) {
             // Try API data structure first
             if (items[0].productCategory !== undefined) {
-              console.log('Filtering API data by productCategory');
-              console.log('Sample item productCategory:', items[0].productCategory);
               items = items.filter(item => item.productCategory === categoryId);
             } else if (items[0].categoryId !== undefined) {
-              console.log('Filtering API data by categoryId');
-              console.log('Sample item categoryId:', items[0].categoryId);
               items = items.filter(item => item.categoryId === categoryId);
             } else {
-              console.log('⚠️ API data structure not recognized');
-              console.log('Sample item keys:', Object.keys(items[0]));
             }
           }
         } else {
-          console.log('❌ No matching category found for:', selectedCategory);
-          console.log('Available categories:', categories.map(cat => cat.name));
           // If no matching category found, return all items
           items = items.filter(item => true);
         }
@@ -488,28 +438,20 @@ const clearStorage = () => {
           if (items.length > 0) {
             // Try different data structures
             if (items[0].productCategory !== undefined) {
-              console.log('Filtering by productCategory');
               items = items.filter(item => item.productCategory === categoryId);
             } else if (items[0].categoryId !== undefined) {
-              console.log('Filtering by categoryId');
               items = items.filter(item => item.categoryId === categoryId);
             } else if (items[0].category !== undefined) {
-              console.log('Filtering by category name');
               items = items.filter(item => item.category?.toLowerCase() === selectedCategory.toLowerCase());
             } else {
-              console.log('⚠️ Data structure not recognized');
             }
           }
         } else {
-          console.log('❌ No matching category found for:', selectedCategory);
-          console.log('Available categories:', menuData.categoriesApiResponse?.data?.map(cat => cat.name));
           // If no matching category found, return all items
           items = items.filter(item => true);
         }
       }
     }
-
-    console.log('✅ Items after category filtering:', items.length);
 
     // Filter by search query
     if (searchQuery.trim()) {
@@ -539,7 +481,11 @@ const clearStorage = () => {
     const normalized = categoryName.toLowerCase();
     setSelectedCategory(normalized);
     window.requestAnimationFrame(() => {
-      document.getElementById('menu-grid')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      const target = document.getElementById('menu-grid');
+      if (!target) return;
+      const offset = 270; // tweak to taste
+      const top = target.getBoundingClientRect().top + window.scrollY - offset;
+      window.scrollTo({ top, behavior: 'smooth' });
     });
   };
 

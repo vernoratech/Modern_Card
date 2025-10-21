@@ -15,19 +15,16 @@ const MenuFilters = ({
   const safeCategories = Array.isArray(categories) ? categories.filter(Boolean) : [];
   const selectedCategoryValue = (selectedCategory ?? 'all').toLowerCase();
 
-  console.log('MenuFilters Debug:', {
-    categories,
-    safeCategories: safeCategories.length,
-    selectedCategory,
-    selectedCategoryValue,
-    isArray: Array.isArray(categories),
-    sampleCategory: safeCategories[0]
-  });
+  // console.log('MenuFilters Debug:', {
+  //   categories,
+  //   safeCategories: safeCategories.length,
+  //   selectedCategory,
+  //   selectedCategoryValue,
+  //   isArray: Array.isArray(categories),
+  //   sampleCategory: safeCategories[0]
+  // });
 
   // Debug: Check if categories are being passed correctly
-  if (safeCategories.length === 0) {
-    console.log('No categories available for display');
-  }
 
   return (
     <section

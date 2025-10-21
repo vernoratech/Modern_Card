@@ -35,31 +35,17 @@ const ProductDetails = () => {
           menuItems = menuData.menuItems;
         }
 
-        console.log('ProductDetails - Menu items loaded:', menuItems.length, 'items');
-        console.log('Looking for productId:', productId);
-
         // Find product - handle both API (_id) and static (id) data
         const foundProduct = menuItems.find(item => {
           const itemId = item._id || item.id;
           const matches = String(itemId) === productId;
-          console.log('ProductDetails Debug:', {
-            productId,
-            itemId,
-            itemName: item.itemName || item.name,
-            matches
-          });
           return matches;
         });
 
         if (foundProduct) {
-          console.log('Product found:', foundProduct.itemName || foundProduct.name);
           setProduct(foundProduct);
           setActiveImageIdx(0);
         } else {
-          console.log('Product not found, available products:', menuItems.map(item => ({
-            id: item.id || item._id,
-            name: item.name || item.itemName
-          })));
           navigate('/', { replace: true });
         }
       } catch (error) {
