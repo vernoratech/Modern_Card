@@ -1,5 +1,5 @@
 // src/components/DigitalMenu/MenuFilters.jsx
-import React from 'react'
+import React, { useRef } from 'react'
 import { BsSearchHeart } from 'react-icons/bs';
 import { LuUtensilsCrossed } from 'react-icons/lu';
 import { TbReportSearch } from 'react-icons/tb';
@@ -25,7 +25,35 @@ const MenuFilters = ({
   //   sampleCategory: safeCategories[0]
   // });
 
-  // Debug: Check if categories are being passed correctly
+  const categoriesContainerRef = useRef(null);
+
+  const handleCategorySelect = (categoryName, buttonElement) => {
+    if (!categoryName) return;
+    onCategoryChange?.(categoryName);
+
+    const container = categoriesContainerRef.current;
+    if (!container || !buttonElement) {
+      return;
+    }
+
+    if (categoryName.toLowerCase() === 'all') {
+      container.scrollTo({ left: 0, behavior: 'smooth' });
+      return;
+    }
+
+    const containerRect = container.getBoundingClientRect();
+    const buttonRect = buttonElement.getBoundingClientRect();
+
+    const isOverflowingLeft = buttonRect.left < containerRect.left;
+    const isOverflowingRight = buttonRect.right > containerRect.right;
+
+    if (isOverflowingLeft || isOverflowingRight) {
+      const containerCenter = containerRect.left + (containerRect.width / 2);
+      const buttonCenter = buttonRect.left + (buttonRect.width / 2);
+      const offset = buttonCenter - containerCenter;
+      container.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+  };
 
   return (
     <section
@@ -74,7 +102,7 @@ const MenuFilters = ({
           </div>
 
           {/* Enhanced Items Counter */}
-          { <div className="flex w-full items-center justify-end md:w-auto">
+          {<div className="flex w-full items-center justify-end md:w-auto">
             <div className="rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 px-4 sm:px-5 py-2.5 sm:py-3 shadow-lg shadow-emerald-500/10">
               <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent flex items-center gap-2">
                 <span><TbReportSearch className=" text-xl text-teal-500" /></span><span>{totalItems} items found</span>
@@ -91,6 +119,7 @@ const MenuFilters = ({
 
           <div
             id="menu-categories"
+            ref={categoriesContainerRef}
             className="flex w-full snap-x gap-3 sm:gap-4 overflow-x-auto pb-4 sm:pb-5 scrollbar-hide"
             style={{
               scrollbarWidth: 'none',
@@ -101,10 +130,10 @@ const MenuFilters = ({
             {/* All Items Button - Dynamic Width */}
             <button
               className={`group relative flex shrink-0 snap-start items-center justify-center gap-2 sm:gap-3 rounded-2xl border px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${selectedCategory === 'all'
-                  ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
-                  : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
-                }`}
-              onClick={() => onCategoryChange('all')}
+                ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
+                : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
+              }`}
+              onClick={(event) => handleCategorySelect('all', event.currentTarget)}
             >
               <span className={`text-base sm:text-lg transition-transform group-hover:scale-110 ${selectedCategory === 'all' ? 'animate-pulse' : ''}`}>
                 🍽️
@@ -114,7 +143,7 @@ const MenuFilters = ({
               </div>
               {selectedCategory === 'all' && (
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping" />
-                
+
               )}
             </button>
 
@@ -124,15 +153,14 @@ const MenuFilters = ({
                 const categoryName = category?.name ?? '';
                 const active = categoryName && selectedCategoryValue === categoryName.toLowerCase();
                 const categoryId = category?._id || category?.id; // Handle both API and static formats
-                {console.log(selectedCategory,active)}
                 return (
                   <button
                     key={categoryId}
                     className={`group relative flex shrink-0 snap-start items-center gap-2 sm:gap-3 rounded-2xl border px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${active
-                        ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
-                        : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
-                      }`}
-                    onClick={() => categoryName && onCategoryChange?.(categoryName)}
+                      ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
+                      : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
+                    }`}
+                    onClick={(event) => categoryName && handleCategorySelect(categoryName, event.currentTarget)}
                   >
                     <span className={`text-base sm:text-lg transition-transform group-hover:scale-110 ${active ? 'animate-pulse' : ''}`}>
                       {category.icon || '🍽️'}
