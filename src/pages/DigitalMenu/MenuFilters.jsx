@@ -2,6 +2,7 @@
 import React from 'react'
 import { BsSearchHeart } from 'react-icons/bs';
 import { LuUtensilsCrossed } from 'react-icons/lu';
+import { TbReportSearch } from 'react-icons/tb';
 
 const MenuFilters = ({
   categories,
@@ -75,8 +76,8 @@ const MenuFilters = ({
           {/* Enhanced Items Counter */}
           { <div className="flex w-full items-center justify-end md:w-auto">
             <div className="rounded-2xl bg-gradient-to-r from-emerald-50 to-teal-50 border border-emerald-200/60 px-4 sm:px-5 py-2.5 sm:py-3 shadow-lg shadow-emerald-500/10">
-              <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                {totalItems} items found
+              <span className="text-xs sm:text-sm font-semibold bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent flex items-center gap-2">
+                <span><TbReportSearch className=" text-xl text-teal-500" /></span><span>{totalItems} items found</span>
               </span>
             </div>
           </div>}
@@ -113,6 +114,7 @@ const MenuFilters = ({
               </div>
               {selectedCategory === 'all' && (
                 <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping" />
+                
               )}
             </button>
 
@@ -122,6 +124,7 @@ const MenuFilters = ({
                 const categoryName = category?.name ?? '';
                 const active = categoryName && selectedCategoryValue === categoryName.toLowerCase();
                 const categoryId = category?._id || category?.id; // Handle both API and static formats
+                {console.log(selectedCategory,active)}
                 return (
                   <button
                     key={categoryId}
@@ -135,7 +138,7 @@ const MenuFilters = ({
                       {category.icon || '🍽️'}
                     </span>
                     <div className="flex items-center justify-center">
-                      <span className="leading-tight whitespace-nowrap">{categoryName || 'Category'}</span>
+                      <span className="leading-tight whitespace-nowrap">{categoryName || 'Category'}{active ? ` (${totalItems})` : ''}</span>
                     </div>
                     {active && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 bg-white rounded-full animate-ping" />
