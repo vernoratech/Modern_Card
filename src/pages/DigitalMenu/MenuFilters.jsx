@@ -1,7 +1,8 @@
 // src/components/DigitalMenu/MenuFilters.jsx
 import React, { useRef } from 'react'
 import { BsSearchHeart } from 'react-icons/bs';
-import { LuUtensilsCrossed } from 'react-icons/lu';
+import { IoFastFoodOutline } from 'react-icons/io5';
+import { LuScanSearch, LuUtensilsCrossed } from 'react-icons/lu';
 import { TbReportSearch } from 'react-icons/tb';
 
 const MenuFilters = ({
@@ -68,11 +69,11 @@ const MenuFilters = ({
       <div className="relative">
         {/* Header Section */}
         <div className="mb-6 sm:mb-8">
-          <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-clip-text text-transparent mb-2">
-            Discover Delicious Dishes
+          <h2 className="text-xl sm:text-2xl font-bold bg-gradient-to-r from-slate-800 via-slate-700 to-slate-800 bg-clip-text text-transparent mb-2 flex items-center gap-2">
+            <span className="text-md">Discover Delicious Dishes</span><span className="text-slate-600 text-2xl"><IoFastFoodOutline /></span>
           </h2>
           <p className="text-sm sm:text-base text-slate-600">
-            Search through our curated collection of mouthwatering meals
+            Explore our lineup of freshly made, delicious dishes.
           </p>
         </div>
 
@@ -113,8 +114,8 @@ const MenuFilters = ({
 
         {/* Enhanced Category Filters */}
         <div className="mt-2 sm:mt-3">
-          <h3 className="text-sm sm:text-base font-semibold text-slate-700 mb-4 sm:mb-5">
-            Browse by Category
+          <h3 className="text-sm sm:text-base font-semibold text-slate-700 mb-4 sm:mb-5 flex items-center gap-2">
+            <span className="text-md">Browse by Category</span><span className="text-slate-500 text-xl"><LuScanSearch /></span>
           </h3>
 
           <div
@@ -132,7 +133,7 @@ const MenuFilters = ({
               className={`group relative flex shrink-0 snap-start items-center justify-center gap-2 sm:gap-3 rounded-2xl border px-6 sm:px-8 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${selectedCategory === 'all'
                 ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
                 : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
-              }`}
+                }`}
               onClick={(event) => handleCategorySelect('all', event.currentTarget)}
             >
               <span className={`text-base sm:text-lg transition-transform group-hover:scale-110 ${selectedCategory === 'all' ? 'animate-pulse' : ''}`}>
@@ -159,7 +160,7 @@ const MenuFilters = ({
                     className={`group relative flex shrink-0 snap-start items-center gap-2 sm:gap-3 rounded-2xl border px-4 sm:px-6 py-3 sm:py-4 text-sm sm:text-base font-semibold transition-all duration-300 ${active
                       ? 'border-transparent bg-gradient-to-r from-emerald-500 via-teal-500 to-cyan-500 text-white shadow-xl shadow-emerald-500/40 scale-105'
                       : 'border-slate-200/60 bg-white/80 text-slate-600 hover:border-emerald-300 hover:text-emerald-600 hover:bg-emerald-50/80 hover:shadow-lg hover:shadow-emerald-500/20 hover:scale-102'
-                    }`}
+                      }`}
                     onClick={(event) => categoryName && handleCategorySelect(categoryName, event.currentTarget)}
                   >
                     <span className={`text-base sm:text-lg transition-transform group-hover:scale-110 ${active ? 'animate-pulse' : ''}`}>

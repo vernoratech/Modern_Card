@@ -79,6 +79,7 @@ const MenuNavbar = ({ restaurant, restaurantResponse }) => {
           className="fixed inset-0 z-40 bg-slate-900/60 backdrop-blur-sm transition md:hidden"
         />
       )}
+      {/* {console.log(isScrolled)} */}
       <nav
         className={`sticky top-0 z-50 mx-auto flex w-full max-w-7xl items-center justify-between gap-2 rounded-none border-b border-white/10 bg-gradient-to-r from-slate-950/95 via-slate-900/90 to-slate-950/95 px-3 py-3 text-white shadow-xl backdrop-blur-xl transition-all duration-300 sm:px-4 sm:py-3 md:mt-6 md:rounded-2xl md:border md:border-white/5 md:px-6 ${isScrolled ? 'md:py-2.5 lg:py-3' : 'md:py-4'
           }`}
