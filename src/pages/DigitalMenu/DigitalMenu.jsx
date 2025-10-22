@@ -14,6 +14,7 @@ import { fetchCategories } from '../../services/restaurantService.js';
 import { useRestaurantData } from '../../context/RestaurantDataContext.jsx';
 import { useCart } from '../../context/CartContext';
 import { useToast } from '../../context/ToastContext.jsx';
+import { buildShowcaseItems } from '../../utils/helpers.js';
 
 const DigitalMenu = () => {
   const location = useLocation();
@@ -196,19 +197,23 @@ const DigitalMenu = () => {
   }, [menuItemsData, dynamicCategories]);
 
   const showcaseItems = useMemo(() => {
-    if (menuItemsData.length === 0) {
-      return [];
-    }
+    const items = buildShowcaseItems(menuItemsData, { limit: 8 });
+    console.log('Showcase items created:', items.length);
+    return items;
+  }, [menuItemsData]);
 
-    const shuffled = [...menuItemsData]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, 8);
+  { console.log("menuItemsData:", menuItemsData); }
 
-    console.log('Showcase items created:', shuffled.length);
-    return shuffled.map((item) => ({
-      ...item,
-      tag: item.isBestseller ? 'Best Seller' : item.isVeg ? 'Veg' : 'Popular',
-    }));
+  const MAIN_COURSE_CATEGORY_ID = '68e0d4772ea12265636db3e0';
+
+  const mainCourseItems = useMemo(() => {
+    const items = buildShowcaseItems(menuItemsData, {
+      key: 'productCategory',
+      value: MAIN_COURSE_CATEGORY_ID,
+      limit: 8,
+    });
+    console.log('Main course items selected:', items.length);
+    return items;
   }, [menuItemsData]);
 
   // Utility functions for localStorage with TTL
@@ -684,28 +689,12 @@ const DigitalMenu = () => {
             viewAllCategory="all"
           />
           <MenuHorizontalShowcase
-            title="Fresh off the grill"
-            subtitle="Hot picks sizzling straight from our kitchen"
-            items={showcaseItems}
+            title="See Our Main Course items"
+            subtitle="Get ready to savor the flavors of our main course"
+            items={mainCourseItems}
             onItemClick={handleProductClick}
             onAdd={handleShowcaseAdd}
             viewAllCategory="main course"
-          />
-          <MenuHorizontalShowcase
-            title="Chef's cravings"
-            subtitle="Specially curated plates for your appetite"
-            items={showcaseItems}
-            onItemClick={handleProductClick}
-            onAdd={handleShowcaseAdd}
-            viewAllCategory="starters"
-          />
-          <MenuHorizontalShowcase
-            title="Sweet tooth alerts"
-            subtitle="Dessert delights to wrap things up"
-            items={showcaseItems}
-            onItemClick={handleProductClick}
-            onAdd={handleShowcaseAdd}
-            viewAllCategory="desserts"
           />
         </div>
       )}
